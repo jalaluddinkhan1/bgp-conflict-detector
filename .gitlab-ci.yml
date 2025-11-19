@@ -1,0 +1,26 @@
+stages:
+  - validate
+
+variables:
+  INFRAHUB_URL: "http://localhost:8000"
+  INFRAHUB_TOKEN: "18795e9c-b6db-fbff-cf87-10652e494a9a"
+  CONFLICT_WINDOW_MINUTES: "5"
+  GIT_DIFF_FILES: "$CI_COMMIT_BEFORE_SHA $CI_COMMIT_SHA"
+
+bgp_conflict_detection:
+  stage: validate
+  image: python:3.11-slim
+  before_script:
+    - pip install httpx pyyaml gql[requests] infrahub-sdk
+  script:
+    - python scripts/detect_bgp_conflicts.py
+  artifacts:
+    reports:
+      dotenv: conflict-report.env
+    paths:
+      - conflict-report.json
+    when: always
+  only:
+    - merge_requests
+    - main
+

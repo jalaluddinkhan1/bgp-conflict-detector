@@ -1,0 +1,68 @@
+---
+version: '1.0'
+generics:
+  - name: BGPObject
+    namespace: Network
+    description: "Base BGP entity"
+    attributes:
+      - name: name
+        kind: Text
+        unique: true
+      - name: description
+        kind: Text
+        optional: true
+
+nodes:
+  - name: BGPInstance
+    namespace: Network
+    label: "BGP Instance"
+    inherit_from: [BGPObject]
+    attributes:
+      - name: asn
+        kind: Number
+        optional: false
+    relationships:
+      - name: device
+        peer: InfraDevice
+        cardinality: one
+        kind: Attribute
+      - name: sessions
+        peer: NetworkBGPSession
+        cardinality: many
+        identifier: bgp_instance__session
+
+  - name: BGPSession
+    namespace: Network
+    label: "BGP Session"
+    inherit_from: [BGPObject]
+    attributes:
+      - name: peer_ip
+        kind: IPHost
+        optional: false
+      - name: peer_asn
+        kind: Number
+        optional: false
+      - name: state
+        kind: Text
+        default_value: "active"
+        optional: true
+      - name: route_map_in
+        kind: Text
+        optional: true
+      - name: route_map_out
+        kind: Text
+        optional: true
+      - name: hold_time
+        kind: Number
+        optional: true
+        default_value: 180
+      - name: keepalive
+        kind: Number
+        optional: true
+        default_value: 60
+    relationships:
+      - name: instance
+        peer: NetworkBGPInstance
+        cardinality: one
+        identifier: bgp_instance__session
+

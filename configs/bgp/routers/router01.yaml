@@ -1,0 +1,15 @@
+device: router01
+bgp_peers:
+  - peer_ip: 192.168.1.2
+    peer_asn: 65001
+    route_map_in: RM_FROM_ROUTER02_IN
+    route_map_out: RM_TO_ROUTER02_OUT
+    hold_time: 180
+    keepalive: 60
+  - peer_ip: 192.168.2.2
+    peer_asn: 65002
+    route_map_in: RM_FROM_ROUTER03_IN
+    route_map_out: RM_TO_ROUTER03_OUT
+    hold_time: 180
+    keepalive: 60
+

@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  infrahub:
+    image: registry.opsmill.io/opsmill/infrahub:0.16
+    command: infrahub server start --debug
+    environment:
+      INFRAHUB_DB_TYPE: memgraph
+      INFRAHUB_BROKER_TYPE: rabbitmq
+      INFRAHUB_CACHE_TYPE: redis
+      INFRAHUB_SECURITY_INITIAL_ADMIN_TOKEN: 18795e9c-b6db-fbff-cf87-10652e494a9a
+      INFRAHUB_ALLOW_ANONYMOUS_TELEMETRY: false
+    ports:
+      - "8000:8000"
+    depends_on:
+      - database
+      - message_queue
+      - cache
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/info"]
+      interval: 10s
+      retries: 10
+
+  database:
+    image: memgraph/memgraph:2.18
+    ports:
+      - "7687:7687"
+    command: ["--memory-limit=2gb", "--log-level=WARNING"]
+
+  message_queue:
+    image: rabbitmq:3.12-management
+    environment:
+      RABBITMQ_DEFAULT_USER: infrahub
+      RABBITMQ_DEFAULT_PASS: infrahub
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  cache:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  conflict_api:
+    build: ./api
+    ports:
+      - "8001:8001"
+    environment:
+      INFRAHUB_URL: http://infrahub:8000
+      INFRAHUB_TOKEN: 18795e9c-b6db-fbff-cf87-10652e494a9a
+    depends_on:
+      infrahub:
+        condition: service_healthy
+
+  gitlab-runner:
+    image: gitlab/gitlab-runner:latest
+    volumes:
+      - ./:/network-configs
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - CI_SERVER_URL=http://gitlab.com
+    profiles:
+      - ci
+
