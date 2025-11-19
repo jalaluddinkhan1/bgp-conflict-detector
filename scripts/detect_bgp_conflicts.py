@@ -55,7 +55,7 @@ class BGPConflictDetector:
             if "bgp/" not in file_path:
                 continue
                 
-            print(f"📄 Analyzing Git change: {file_path}")
+            print(f"Analyzing Git change: {file_path}")
             
             # Extract device name
             parts = file_path.split('/')
@@ -156,11 +156,11 @@ class BGPConflictDetector:
                     'changed_by': node['created_by']['display_label']
                 })
             
-            print(f"🔍 Found {len(sessions)} recent BGP changes in Infrahub")
+            print(f"Found {len(sessions)} recent BGP changes in Infrahub")
             return sessions
             
         except Exception as e:
-            print(f"⚠️ GraphQL query failed: {e}")
+            print(f"WARNING: GraphQL query failed: {e}")
             return []
     
     def check_session_flapping(self, session_name: str, window_minutes: int = 5) -> Dict[str, Any]:
@@ -290,18 +290,18 @@ class BGPConflictDetector:
         project_id = os.getenv("CI_PROJECT_ID")
         
         if not all([gitlab_token, mr_id, project_id]):
-            print("⚠️ GitLab MR context not available, skipping comment")
+            print("WARNING: GitLab MR context not available, skipping comment")
             return
         
         if not conflicts:
             return
         
-        comment = "🚨 **BGP Conflict Detected**\\n\\n"
+        comment = "**BGP Conflict Detected**\\n\\n"
         comment += "The following BGP resources have been modified recently:\\n\\n"
         
         for c in conflicts:
-            emoji = "🔴" if c['severity'] == 'HIGH' else "🟡"
-            comment += f"{emoji} **{c['type'].replace('_', ' ').title()}**\\n"
+            severity_label = "[HIGH]" if c['severity'] == 'HIGH' else "[MEDIUM]"
+            comment += f"{severity_label} **{c['type'].replace('_', ' ').title()}**\\n"
             comment += f"- **Device:** `{c['device']}`\\n"
             comment += f"- **Session:** `{c['session']}`\\n"
             comment += f"- **Peer IP:** `{c['peer_ip']}`\\n"
@@ -317,9 +317,9 @@ class BGPConflictDetector:
                 json={"body": comment}
             )
             response.raise_for_status()
-            print(f"💬 Posted conflict warning to MR #{mr_id}")
+            print(f"Posted conflict warning to MR #{mr_id}")
         except Exception as e:
-            print(f"⚠️ Failed to post MR comment: {e}")
+            print(f"WARNING: Failed to post MR comment: {e}")
 
 def parse_args():
     parser = argparse.ArgumentParser(description='BGP Conflict Detection')
@@ -332,14 +332,14 @@ def parse_args():
     return parser.parse_args()
 
 def main():
-    print("🚀 BGP Conflict Detection Engine Starting...")
+    print("BGP Conflict Detection Engine Starting...")
     args = parse_args()
     
     if not args.diff_files:
-        print("✅ No files changed in this commit.")
+        print("No files changed in this commit.")
         sys.exit(0)
     
-    print(f"📂 Analyzing {len(args.diff_files.split())} changed files...")
+    print(f"Analyzing {len(args.diff_files.split())} changed files...")
     
     detector = BGPConflictDetector(args.infrahub_url, args.infrahub_token)
     
@@ -347,10 +347,10 @@ def main():
     git_changes = detector.extract_bgp_changes_from_git(args.diff_files)
     
     if not git_changes:
-        print("✅ No BGP-related changes detected.")
+        print("No BGP-related changes detected.")
         sys.exit(0)
     
-    print(f"🔍 Found BGP changes for devices: {list(git_changes.keys())}")
+    print(f"Found BGP changes for devices: {list(git_changes.keys())}")
     
     # 2. Get recent BGP changes from Infrahub
     recent_sessions = detector.get_recent_bgp_changes_graphql(args.window_minutes)
@@ -362,7 +362,7 @@ def main():
     report = detector.write_conflict_report(conflicts)
     
     if conflicts:
-        print(f"❌ {len(conflicts)} conflicts detected!")
+        print(f"ERROR: {len(conflicts)} conflicts detected!")
         for c in conflicts:
             print(json.dumps(c, indent=2))
         
@@ -375,7 +375,7 @@ def main():
         
         sys.exit(1)
     
-    print("✅ No BGP conflicts detected. Safe to merge.")
+    print("No BGP conflicts detected. Safe to merge.")
     sys.exit(0)
 
 if __name__ == "__main__":

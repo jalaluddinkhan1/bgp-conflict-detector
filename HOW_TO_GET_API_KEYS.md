@@ -1,6 +1,6 @@
 # How to Get API Keys - Step by Step Guide
 
-## 🔑 INFRAHUB_TOKEN (Required)
+## INFRAHUB_TOKEN (Required)
 
 ### Method 1: Use Default Token (Local Development Only)
 
@@ -63,11 +63,11 @@ set INFRAHUB_TOKEN=your-copied-token-here
 python scripts/load_test_data.py
 ```
 
-If it works, you'll see: `✅ Infrahub is ready!`
+If it works, you'll see: `Infrahub is ready!`
 
 ---
 
-## 🔑 GITLAB_TOKEN (Optional - Only for MR Comments)
+## GITLAB_TOKEN (Optional - Only for MR Comments)
 
 ### Step 1: Log in to GitLab
 1. Go to [GitLab.com](https://gitlab.com) (or your GitLab instance)
@@ -95,8 +95,8 @@ If it works, you'll see: `✅ Infrahub is ready!`
 4. Fill in:
    - **Key**: `GITLAB_TOKEN`
    - **Value**: `glpat-xxxxxxxxxxxxxxxxxxxx` (paste your token)
-   - ✅ Check **"Mask variable"** (hides token in logs)
-   - ✅ Check **"Protect variable"** (only available in protected branches)
+   - Check **"Mask variable"** (hides token in logs)
+   - Check **"Protect variable"** (only available in protected branches)
 5. Click **Add variable**
 
 ### Step 5: Use Locally (For Testing)
@@ -110,7 +110,7 @@ $env:GITLAB_TOKEN="glpat-xxxxxxxxxxxxxxxxxxxx"
 
 ---
 
-## 🚀 Quick Start (No Token Setup Needed)
+## Quick Start (No Token Setup Needed)
 
 If you just want to test the system locally, you can skip token setup entirely:
 
@@ -132,7 +132,7 @@ The default token `06438eb2-7c35-4f8d-9a6e-1d3e5f89c4f2` is already configured!
 
 ---
 
-## ✅ Verify Your Tokens Work
+## Verify Your Tokens Work
 
 ### Test INFRAHUB_TOKEN:
 ```bash
@@ -143,7 +143,7 @@ export INFRAHUB_TOKEN="your-token"
 python -c "
 from infrahub_sdk import InfrahubClientSync
 client = InfrahubClientSync(address='http://localhost:8000', token='$INFRAHUB_TOKEN')
-print('✅ Token works!')
+print('Token works!')
 "
 ```
 
@@ -160,7 +160,7 @@ If you get your user info back, the token works!
 
 ---
 
-## 🔒 Security Notes
+## Security Notes
 
 1. **Never commit tokens to Git** - They're in `.gitignore` for a reason!
 2. **Use environment variables** - Don't hardcode tokens in scripts
@@ -170,35 +170,35 @@ If you get your user info back, the token works!
 
 ---
 
-## 🆘 Troubleshooting
+## Troubleshooting
 
 ### "Authentication failed" with Infrahub
-- ✅ Check Infrahub is running: `docker-compose ps`
-- ✅ Verify token is correct: Check for typos
-- ✅ Check token hasn't expired
-- ✅ Try the default token: `06438eb2-7c35-4f8d-9a6e-1d3e5f89c4f2`
+- Check Infrahub is running: `docker-compose ps`
+- Verify token is correct: Check for typos
+- Check token hasn't expired
+- Try the default token: `18795e9c-b6db-fbff-cf87-10652e494a9a`
 
 ### "GitLab MR context not available"
-- ✅ This is normal if running locally (not in GitLab CI)
-- ✅ Set `GITLAB_TOKEN` only if you want MR comments
-- ✅ The system works fine without it!
+- This is normal if running locally (not in GitLab CI)
+- Set `GITLAB_TOKEN` only if you want MR comments
+- The system works fine without it!
 
 ### "Connection refused" to Infrahub
-- ✅ Start Infrahub: `docker-compose up -d`
-- ✅ Wait 30-60 seconds for it to start
-- ✅ Check logs: `docker-compose logs infrahub`
-- ✅ Verify URL: `curl http://localhost:8000/api/info`
+- Start Infrahub: `docker-compose up -d`
+- Wait 30-60 seconds for it to start
+- Check logs: `docker-compose logs infrahub`
+- Verify URL: `curl http://localhost:8000/api/info`
 
 ---
 
-## 📝 Summary
+## Summary
 
 **For Local Testing:**
-- ✅ No setup needed! Default token works
-- ✅ Just run: `docker-compose up -d` and start testing
+- No setup needed! Default token works
+- Just run: `docker-compose up -d` and start testing
 
 **For Production:**
-- ✅ Generate your own `INFRAHUB_TOKEN` from Infrahub UI
-- ✅ (Optional) Generate `GITLAB_TOKEN` for MR comments
-- ✅ Store tokens as environment variables or CI/CD secrets
+- Generate your own `INFRAHUB_TOKEN` from Infrahub UI
+- (Optional) Generate `GITLAB_TOKEN` for MR comments
+- Store tokens as environment variables or CI/CD secrets
 

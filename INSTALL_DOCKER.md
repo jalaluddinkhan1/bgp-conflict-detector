@@ -1,6 +1,6 @@
 # Installing Docker Desktop on Windows
 
-## 🐳 Step-by-Step Installation Guide
+## Step-by-Step Installation Guide
 
 ### Step 1: Download Docker Desktop
 
@@ -16,8 +16,8 @@
 1. **Double-click the downloaded installer** (`Docker Desktop Installer.exe`)
 
 2. **Follow the installation wizard:**
-   - ✅ Check "Use WSL 2 instead of Hyper-V" (recommended for Windows 10/11)
-   - ✅ Check "Add shortcut to desktop" (optional)
+   - Check "Use WSL 2 instead of Hyper-V" (recommended for Windows 10/11)
+   - Check "Add shortcut to desktop" (optional)
    - Click **"Ok"** to start installation
 
 3. **Wait for installation to complete** (5-10 minutes)
@@ -76,7 +76,7 @@ This message shows that your installation appears to be working correctly.
 
 ---
 
-## ⚙️ System Requirements
+## System Requirements
 
 ### Minimum Requirements:
 - **Windows 10 64-bit**: Pro, Enterprise, or Education (Build 19041 or higher)
@@ -99,12 +99,12 @@ systeminfo | findstr /C:"Hyper-V Requirements"
 ```
 
 Look for:
-- "A hypervisor has been detected" = ✅ Good
-- "Virtualization Enabled In Firmware: Yes" = ✅ Good
+- "A hypervisor has been detected" = Good
+- "Virtualization Enabled In Firmware: Yes" = Good
 
 ---
 
-## 🔧 Enable WSL 2 (If Needed)
+## Enable WSL 2 (If Needed)
 
 Docker Desktop requires WSL 2. If you don't have it:
 
@@ -136,7 +136,7 @@ wsl --set-default-version 2
 
 ---
 
-## 🚨 Troubleshooting
+## Troubleshooting
 
 ### "Docker Desktop won't start"
 
@@ -190,7 +190,7 @@ taskkill /PID <PID> /F
 
 ---
 
-## ✅ After Installation
+## After Installation
 
 Once Docker is installed and running:
 
@@ -217,7 +217,7 @@ Once Docker is installed and running:
 
 ---
 
-## 🎯 Quick Checklist
+## Quick Checklist
 
 - [ ] Downloaded Docker Desktop installer
 - [ ] Ran installer and completed setup
@@ -229,7 +229,7 @@ Once Docker is installed and running:
 
 ---
 
-## 💡 Tips
+## Tips
 
 1. **Keep Docker Desktop running** - It needs to be running to use Docker commands
 2. **Check system tray** - Docker icon shows if it's running
@@ -239,7 +239,7 @@ Once Docker is installed and running:
 
 ---
 
-## 🆘 Still Having Issues?
+## Still Having Issues?
 
 1. Check Docker Desktop logs:
    - Click Docker icon → Troubleshoot → View logs

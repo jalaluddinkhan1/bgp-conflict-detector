@@ -1,6 +1,6 @@
 # How to Run the BGP Conflict Detection System
 
-## 🚀 Quick Start (3 Options)
+## Quick Start (3 Options)
 
 ### Option 1: Demo Without Docker (Fastest - 30 seconds)
 
@@ -68,13 +68,13 @@ python scripts/load_test_data.py
 
 Expected output:
 ```
-✅ Infrahub is ready!
-✅ Created device: router01
-✅ Created device: router02
-✅ Created device: router03
-✅ Created BGP instance for router01
-✅ Created BGP session: router01_192.168.1.2
-🎉 Test data loaded successfully!
+Infrahub is ready!
+Created device: router01
+Created device: router02
+Created device: router03
+Created BGP instance for router01
+Created BGP session: router01_192.168.1.2
+Test data loaded successfully!
 ```
 
 **Step 5: Run Demo Scenarios**
@@ -105,17 +105,17 @@ chmod +x demo-runner.sh
 ```
 
 This script:
-- ✅ Checks dependencies
-- ✅ Starts Docker containers
-- ✅ Waits for Infrahub
-- ✅ Installs Python packages
-- ✅ Loads test data
-- ✅ Runs all demos
-- ✅ Cleans up
+- Checks dependencies
+- Starts Docker containers
+- Waits for Infrahub
+- Installs Python packages
+- Loads test data
+- Runs all demos
+- Cleans up
 
 ---
 
-## 📋 Individual Script Usage
+## Individual Script Usage
 
 ### 1. Conflict Detection Script
 
@@ -163,7 +163,7 @@ python scripts/run_all_demos.py
 
 ---
 
-## 🌐 API Service
+## API Service
 
 ### Start API Service
 
@@ -200,7 +200,7 @@ curl -X POST http://localhost:8001/bgp/check-conflicts \
 
 ---
 
-## 🔧 Troubleshooting
+## Troubleshooting
 
 ### Docker not starting?
 ```bash
@@ -249,7 +249,7 @@ $env:INFRAHUB_URL="http://localhost:8000"    # Windows PowerShell
 
 ---
 
-## ✅ Verify Everything Works
+## Verify Everything Works
 
 Run the validation script:
 ```bash
@@ -258,46 +258,46 @@ python validate_setup.py
 
 Expected output:
 ```
-✅ All checks passed! System is ready to run.
+All checks passed! System is ready to run.
 ```
 
 ---
 
-## 📊 Expected Output
+## Expected Output
 
 When running `python scripts/run_all_demos.py`, you should see:
 
 ```
-🧪 BGP Conflict Detection Demo Suite
+BGP Conflict Detection Demo Suite
 Infrahub: http://localhost:8000
 
-📦 Loading test data...
-✅ Created device: router01
-✅ Created BGP session: router01_192.168.1.2
-🎉 Test data loaded successfully!
+Loading test data...
+Created device: router01
+Created BGP session: router01_192.168.1.2
+Test data loaded successfully!
 
 ============================================================
-🧪 SCENARIO: Concurrent ASN Change
+SCENARIO: Concurrent ASN Change
 ============================================================
-🔧 Setting up scenario...
-🔄 Simulated: router01_192.168.1.2.peer_asn = 65100
-✅ Expected 1 conflicts, found 1
+Setting up scenario...
+Simulated: router01_192.168.1.2.peer_asn = 65100
+Expected 1 conflicts, found 1
 
 ============================================================
-📊 DEMO SUITE SUMMARY
+DEMO SUITE SUMMARY
 ============================================================
-✅ Concurrent ASN Change: PASS
-✅ Route Map Collision: PASS
-✅ Multi-Device Policy Conflict: PASS
-✅ Flapping Session Block: PASS
+[PASS] Concurrent ASN Change: PASS
+[PASS] Route Map Collision: PASS
+[PASS] Multi-Device Policy Conflict: PASS
+[PASS] Flapping Session Block: PASS
 
-📈 Results: 4/4 scenarios passed
-🎉 All scenarios passed!
+Results: 4/4 scenarios passed
+All scenarios passed!
 ```
 
 ---
 
-## 🎯 Quick Reference
+## Quick Reference
 
 | Task | Command |
 |------|---------|
@@ -311,7 +311,7 @@ Infrahub: http://localhost:8000
 
 ---
 
-## 📖 Next Steps
+## Next Steps
 
 1. **Read the code**: Check `scripts/detect_bgp_conflicts.py` to understand the logic
 2. **Modify scenarios**: Edit `scripts/run_all_demos.py` to add your own tests
@@ -320,7 +320,7 @@ Infrahub: http://localhost:8000
 
 ---
 
-## 🆘 Need Help?
+## Need Help?
 
 - Check `README.md` for overview
 - Check `API_KEYS.md` for token setup

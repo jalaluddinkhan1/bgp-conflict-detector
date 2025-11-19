@@ -14,25 +14,25 @@ TOKEN = os.getenv("INFRAHUB_TOKEN", "18795e9c-b6db-fbff-cf87-10652e494a9a")
 
 def wait_for_infrahub():
     """Wait for Infrahub to be ready"""
-    print("⏳ Waiting for Infrahub to be ready...")
+    print("Waiting for Infrahub to be ready...")
     client = httpx.Client()
     for i in range(30):
         try:
             response = client.get(f"{INFRAHUB_URL}/api/info")
             if response.status_code == 200:
-                print("✅ Infrahub is ready!")
+                print("Infrahub is ready!")
                 return True
         except:
             pass
         time.sleep(2)
-    print("❌ Infrahub not ready after 60 seconds")
+    print("ERROR: Infrahub not ready after 60 seconds")
     sys.exit(1)
 
 def load_test_data():
     """Load comprehensive BGP test data"""
     client = InfrahubClientSync(address=INFRAHUB_URL, token=TOKEN)
     
-    print("🗑️  Cleaning old test data...")
+    print("Cleaning old test data...")
     try:
         # Clean up any existing test data
         for device in client.filters(kind="InfraDevice", name__value="router*"):
@@ -41,7 +41,7 @@ def load_test_data():
     except:
         pass
     
-    print("📦 Creating test infrastructure...")
+    print("Creating test infrastructure...")
     
     # Create devices
     devices = [
@@ -74,9 +74,9 @@ def load_test_data():
             device = client.create(kind="InfraDevice", data=dev_data)
             device.save()
             device_objs[dev_data['name']] = device
-            print(f"✅ Created device: {dev_data['name']}")
+            print(f"Created device: {dev_data['name']}")
         except Exception as e:
-            print(f"⚠️  Failed to create {dev_data['name']}: {e}")
+            print(f"WARNING: Failed to create {dev_data['name']}: {e}")
     
     # Create BGP instances
     bgp_instances = {}
@@ -92,9 +92,9 @@ def load_test_data():
             )
             instance.save()
             bgp_instances[name] = instance
-            print(f"✅ Created BGP instance for {name}")
+            print(f"Created BGP instance for {name}")
         except Exception as e:
-            print(f"⚠️  Failed to create BGP instance for {name}: {e}")
+            print(f"WARNING: Failed to create BGP instance for {name}: {e}")
     
     # Create BGP sessions
     sessions = [
@@ -134,15 +134,15 @@ def load_test_data():
                 data=session_data
             )
             session.save()
-            print(f"✅ Created BGP session: {session_data['name']}")
+            print(f"Created BGP session: {session_data['name']}")
         except Exception as e:
-            print(f"⚠️  Failed to create session {session_data['name']}: {e}")
+            print(f"WARNING: Failed to create session {session_data['name']}: {e}")
     
-    print("🎉 Test data loaded successfully!")
-    print("\n📋 Available test devices:")
+    print("Test data loaded successfully!")
+    print("\nAvailable test devices:")
     for name in device_objs.keys():
         print(f"   - {name}")
-    print("\n🧪 Ready to run conflict detection tests!")
+    print("\nReady to run conflict detection tests!")
 
 if __name__ == "__main__":
     wait_for_infrahub()

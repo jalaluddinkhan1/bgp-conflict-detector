@@ -9,12 +9,12 @@ def simulate_flapping(session_name: str, flap_count: int = 5, interval: float = 
     """Simulate BGP session flapping by toggling state"""
     client = InfrahubClientSync(address=infrahub_url, token=token)
     
-    print(f"🌊 Starting flapping simulation for {session_name} ({flap_count} flaps)")
+    print(f"Starting flapping simulation for {session_name} ({flap_count} flaps)")
     
     for i in range(flap_count):
         sessions = client.filters(kind="NetworkBGPSession", name__value=session_name)
         if not sessions:
-            print(f"❌ Session {session_name} not found")
+            print(f"ERROR: Session {session_name} not found")
             return
         
         session = sessions[0]
@@ -25,7 +25,7 @@ def simulate_flapping(session_name: str, flap_count: int = 5, interval: float = 
         print(f"  Flap {i+1}/{flap_count}: state -> {new_state}")
         time.sleep(interval)
     
-    print(f"✅ Flapping simulation complete")
+    print(f"Flapping simulation complete")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

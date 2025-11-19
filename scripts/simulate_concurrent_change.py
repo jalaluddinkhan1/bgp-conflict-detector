@@ -12,7 +12,7 @@ def simulate_change(session_name: str, field: str, value, infrahub_url: str = "h
     sessions = client.filters(kind="NetworkBGPSession", name__value=session_name)
     
     if not sessions:
-        print(f"❌ Session {session_name} not found")
+        print(f"ERROR: Session {session_name} not found")
         sys.exit(1)
     
     session = sessions[0]
@@ -20,7 +20,7 @@ def simulate_change(session_name: str, field: str, value, infrahub_url: str = "h
     setattr(session, field, value)
     session.save()
     
-    print(f"🔄 Simulated: {session_name}.{field} = {value} (was: {old_value})")
+    print(f"Simulated: {session_name}.{field} = {value} (was: {old_value})")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

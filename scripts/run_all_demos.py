@@ -26,12 +26,12 @@ class Demos:
     def run_scenario(self, name: str, setup_func, expected_conflicts: int):
         """Run a single test scenario"""
         print(f"\n{'='*60}")
-        print(f"🧪 SCENARIO: {name}")
+        print(f"SCENARIO: {name}")
         print(f"{'='*60}")
         
         try:
             # Setup
-            print("🔧 Setting up scenario...")
+            print("Setting up scenario...")
             setup_func()
             
             # Wait a moment for changes to register
@@ -58,17 +58,17 @@ class Demos:
                 'conflicts': conflicts
             })
             
-            print(f"✅ Expected {expected_conflicts} conflicts, found {len(conflicts)}")
+            print(f"Expected {expected_conflicts} conflicts, found {len(conflicts)}")
             
             if conflicts:
-                print("\n🚨 Conflicts detected:")
+                print("\nConflicts detected:")
                 for c in conflicts:
                     print(json.dumps(c, indent=2))
             
             return success
             
         except Exception as e:
-            print(f"❌ Scenario failed: {e}")
+            print(f"ERROR: Scenario failed: {e}")
             import traceback
             traceback.print_exc()
             self.results.append({
@@ -125,7 +125,7 @@ class Demos:
         simulate_change('router01_192.168.1.2', 'state', 'down')
         
         # Wait 6 minutes
-        print("⏳ Waiting 6 minutes to test time window...")
+        print("Waiting 6 minutes to test time window...")
         time.sleep(360)
         
         # Now make Git change
@@ -190,7 +190,7 @@ class Demos:
     def print_summary(self):
         """Print test results summary"""
         print(f"\n{'='*60}")
-        print("📊 DEMO SUITE SUMMARY")
+        print("DEMO SUITE SUMMARY")
         print(f"{'='*60}")
         
         total = len(self.results)
@@ -198,29 +198,29 @@ class Demos:
         failed = total - passed
         
         for r in self.results:
-            status_icon = "✅" if r['status'] == 'PASS' else "❌"
-            print(f"{status_icon} {r['name']}: {r['status']}")
+            status_label = "[PASS]" if r['status'] == 'PASS' else "[FAIL]"
+            print(f"{status_label} {r['name']}: {r['status']}")
             
             if r['status'] == 'FAIL':
                 print(f"   Expected {r['expected']} conflicts, got {r['found']}")
         
-        print(f"\n📈 Results: {passed}/{total} scenarios passed")
+        print(f"\nResults: {passed}/{total} scenarios passed")
         
         if failed > 0:
-            print(f"⚠️  {failed} scenarios need attention")
+            print(f"WARNING: {failed} scenarios need attention")
             sys.exit(1)
         else:
-            print("🎉 All scenarios passed!")
+            print("All scenarios passed!")
             sys.exit(0)
 
 def main():
-    print("🧪 BGP Conflict Detection Demo Suite")
+    print("BGP Conflict Detection Demo Suite")
     print(f"Infrahub: {INFRAHUB_URL}")
     
     demos = Demos()
     
     # Load test data first
-    print("\n📦 Loading test data...")
+    print("\nLoading test data...")
     subprocess.run([sys.executable, "scripts/load_test_data.py"], check=True)
     
     # Run scenarios

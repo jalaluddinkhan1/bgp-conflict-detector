@@ -16,7 +16,7 @@ The BGP Conflict Detection System requires the following API keys/tokens:
 
 **Default value (for local dev)**: `06438eb2-7c35-4f8d-9a6e-1d3e5f89c4f2`
    - This is set in `docker-compose.yml` as `INFRAHUB_SECURITY_INITIAL_ADMIN_TOKEN`
-   - ⚠️ **Change this in production!**
+   - **WARNING: Change this in production!**
 
 **Set as environment variable:**
 ```bash
@@ -54,7 +54,7 @@ environment:
 3. Add variable:
    - Key: `GITLAB_TOKEN`
    - Value: `your-gitlab-token`
-   - ✅ Check "Mask variable" and "Protect variable"
+   - Check "Mask variable" and "Protect variable"
 
 **Or as environment variable:**
 ```bash
@@ -69,9 +69,9 @@ export GITLAB_TOKEN="glpat-xxxxxxxxxxxxx"
 
 | Variable | Required | Default | Purpose |
 |----------|----------|---------|---------|
-| `INFRAHUB_TOKEN` | ✅ Yes | `06438eb2-7c35-4f8d-9a6e-1d3e5f89c4f2` | Infrahub API authentication |
+| `INFRAHUB_TOKEN` | Yes | `18795e9c-b6db-fbff-cf87-10652e494a9a` | Infrahub API authentication |
 | `INFRAHUB_URL` | No | `http://localhost:8000` | Infrahub server URL |
-| `GITLAB_TOKEN` | ❌ No | None | GitLab API token for MR comments |
+| `GITLAB_TOKEN` | No | None | GitLab API token for MR comments |
 | `CI_MERGE_REQUEST_IID` | No | Auto-set in GitLab CI | Merge Request ID |
 | `CI_PROJECT_ID` | No | Auto-set in GitLab CI | GitLab Project ID |
 | `GIT_DIFF_FILES` | No | Empty | Space-separated changed files |

@@ -18,7 +18,7 @@ def demo_conflict_detection():
     """Demonstrate conflict detection logic"""
     
     print_header("BGP Conflict Detection System Demo")
-    print("\n📋 This demo shows how the system detects conflicts")
+    print("\nThis demo shows how the system detects conflicts")
     print("   without requiring Docker/Infrahub to be running.\n")
     
     # Simulate Git changes
@@ -31,7 +31,7 @@ def demo_conflict_detection():
         }
     }
     
-    print("📄 Git changes detected:")
+    print("Git changes detected:")
     for device, changes in git_changes.items():
         print(f"   Device: {device}")
         print(f"   - Modified sessions: {list(changes['sessions'])}")
@@ -54,7 +54,7 @@ def demo_conflict_detection():
         }
     ]
     
-    print(f"🔍 Found {len(recent_sessions)} recent BGP changes in Infrahub:")
+    print(f"Found {len(recent_sessions)} recent BGP changes in Infrahub:")
     for session in recent_sessions:
         print(f"   Session: {session['name']}")
         print(f"   - Device: {session['device']}")
@@ -108,10 +108,10 @@ def demo_conflict_detection():
     print_header("Step 4: Conflict Detection Results")
     
     if conflicts:
-        print(f"❌ {len(conflicts)} CONFLICT(S) DETECTED!\n")
+        print(f"ERROR: {len(conflicts)} CONFLICT(S) DETECTED!\n")
         for i, conflict in enumerate(conflicts, 1):
-            emoji = "🔴" if conflict['severity'] == 'HIGH' else "🟡"
-            print(f"{emoji} Conflict #{i}: {conflict['type'].replace('_', ' ').title()}")
+            severity_label = "[HIGH]" if conflict['severity'] == 'HIGH' else "[MEDIUM]"
+            print(f"{severity_label} Conflict #{i}: {conflict['type'].replace('_', ' ').title()}")
             print(f"   Severity: {conflict['severity']}")
             print(f"   Device: {conflict['device']}")
             print(f"   Session: {conflict['session']}")
@@ -119,12 +119,12 @@ def demo_conflict_detection():
             print(f"   Description: {conflict['description']}")
             print()
         
-        print("⚠️  ACTION REQUIRED:")
+        print("ACTION REQUIRED:")
         print("   - Coordinate with the other engineer before merging")
         print("   - Review both changes to avoid conflicts")
         print("   - Consider merging changes together")
     else:
-        print("✅ No conflicts detected. Safe to merge!")
+        print("No conflicts detected. Safe to merge!")
     
     # Show report structure
     print_header("Step 5: Generated Report")
@@ -139,26 +139,26 @@ def demo_conflict_detection():
         }
     }
     
-    print("📊 Conflict Report (JSON format):")
+    print("Conflict Report (JSON format):")
     print(json.dumps(report, indent=2))
     
     # Show what would happen in GitLab CI
     print_header("Step 6: GitLab CI Integration")
     print("In a real GitLab CI pipeline, the system would:")
-    print("   1. ✅ Analyze changed files in the merge request")
-    print("   2. ✅ Query Infrahub for recent changes (last 5 minutes)")
-    print("   3. ✅ Detect conflicts between Git changes and Infrahub changes")
-    print("   4. ✅ Post a comment to the MR if conflicts are found")
-    print("   5. ✅ Fail the pipeline if HIGH severity conflicts exist")
-    print("   6. ✅ Generate artifacts: conflict-report.json")
+    print("   1. Analyze changed files in the merge request")
+    print("   2. Query Infrahub for recent changes (last 5 minutes)")
+    print("   3. Detect conflicts between Git changes and Infrahub changes")
+    print("   4. Post a comment to the MR if conflicts are found")
+    print("   5. Fail the pipeline if HIGH severity conflicts exist")
+    print("   6. Generate artifacts: conflict-report.json")
     
     print_header("Demo Complete!")
-    print("\n💡 To run the full system:")
+    print("\nTo run the full system:")
     print("   1. Install Docker Desktop: https://www.docker.com/products/docker-desktop")
     print("   2. Start infrastructure: docker-compose up -d")
     print("   3. Load test data: python scripts/load_test_data.py")
     print("   4. Run full demos: python scripts/run_all_demos.py")
-    print("\n📖 See README.md for complete setup instructions")
+    print("\nSee README.md for complete setup instructions")
 
 if __name__ == "__main__":
     demo_conflict_detection()
