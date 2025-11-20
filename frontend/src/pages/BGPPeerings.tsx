@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Settings, Plus, RefreshCw, Edit, Trash2, Search, X } from 'lucide-react';
 import { apiClient, BGPPeering } from '@/lib/api';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -109,7 +108,6 @@ const BGPPeeringsPage: React.FC = () => {
             className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <Button variant="secondary" size="sm">
-            <Settings size={16} className="mr-2" />
             Configure
           </Button>
           {selectedIds.length > 0 && (
@@ -145,7 +143,6 @@ const BGPPeeringsPage: React.FC = () => {
             Export JSON
           </Button>
           <Button variant="primary" size="sm">
-            <Plus size={16} className="mr-2" />
             Add
           </Button>
         </div>
@@ -238,17 +235,17 @@ const BGPPeeringsPage: React.FC = () => {
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center justify-end space-x-1">
-                            <button className="p-1 text-orange-600 hover:bg-orange-50 rounded">
-                              <RefreshCw size={16} />
+                            <button className="p-1 text-orange-600 hover:bg-orange-50 rounded text-sm">
+                              Refresh
                             </button>
-                            <button className="p-1 text-yellow-600 hover:bg-yellow-50 rounded">
-                              <Edit size={16} />
+                            <button className="p-1 text-yellow-600 hover:bg-yellow-50 rounded text-sm">
+                              Edit
                             </button>
                             <button
                               onClick={() => deleteMutation.mutate(peering.id)}
-                              className="p-1 text-red-600 hover:bg-red-50 rounded"
+                              className="p-1 text-red-600 hover:bg-red-50 rounded text-sm"
                             >
-                              <Trash2 size={16} />
+                              Delete
                             </button>
                           </div>
                         </td>
@@ -267,7 +264,6 @@ const BGPPeeringsPage: React.FC = () => {
                 size="sm"
                 onClick={handleDeleteSelected}
               >
-                <Trash2 size={16} className="mr-2" />
                 Delete Selected
               </Button>
             </div>
@@ -369,11 +365,9 @@ const BGPPeeringsPage: React.FC = () => {
             </div>
             <div className="flex space-x-2">
               <Button variant="primary" size="sm" className="flex-1">
-                <Search size={14} className="mr-1" />
                 Apply
               </Button>
               <Button variant="secondary" size="sm" onClick={clearFilters} className="flex-1">
-                <X size={14} className="mr-1" />
                 Clear
               </Button>
             </div>

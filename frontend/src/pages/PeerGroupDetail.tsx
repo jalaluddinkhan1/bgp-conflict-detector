@@ -1,7 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, Link } from 'react-router-dom';
-import { Search, Edit, Trash2 } from 'lucide-react';
 import { apiClient, PeerGroup } from '@/lib/api';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -41,15 +40,13 @@ const PeerGroupDetailPage: React.FC = () => {
               className="px-3 py-1.5 border border-gray-300 rounded text-sm"
             />
             <button className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded hover:bg-gray-200">
-              <Search size={16} />
+              Search
             </button>
           </div>
           <Button variant="warning" size="sm">
-            <Edit size={16} className="mr-2" />
             Edit
           </Button>
           <Button variant="danger" size="sm">
-            <Trash2 size={16} className="mr-2" />
             Delete
           </Button>
         </div>
@@ -152,9 +149,9 @@ const PeerGroupDetailPage: React.FC = () => {
               <div className="flex items-center justify-between py-2 border-b border-gray-100">
                 <span className="text-sm font-medium text-gray-700">Enabled:</span>
                 {group.enabled ? (
-                  <span className="text-green-600">✓</span>
+                  <span className="text-green-600">Yes</span>
                 ) : (
-                  <span className="text-gray-400">-</span>
+                  <span className="text-gray-400">No</span>
                 )}
               </div>
               <div className="flex items-center justify-between py-2 border-b border-gray-100">

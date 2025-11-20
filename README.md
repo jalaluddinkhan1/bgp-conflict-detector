@@ -2,7 +2,7 @@
 
 A production-ready, feature-complete web application for managing BGP (Border Gateway Protocol) network infrastructure with a modern, intuitive UI inspired by Nautobot.
 
-## 🚀 Features
+## Features
 
 - **Complete BGP Management**: Peerings, Peer Groups, Peer Endpoints, Autonomous Systems
 - **Advanced Features**: Address Families (AFI-SAFI), Routing Policies, Session State Tracking
@@ -15,7 +15,7 @@ A production-ready, feature-complete web application for managing BGP (Border Ga
 - **Audit Trail**: Complete change log with field-level tracking
 - **Tags System**: Flexible categorization with color coding
 
-## 📋 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Python 3.11+
@@ -59,7 +59,7 @@ chmod +x start_ui.sh
 ./start_ui.sh
 ```
 
-## 🏗️ Architecture
+## Architecture
 
 ### Backend
 - **Framework**: FastAPI (Python)
@@ -74,7 +74,7 @@ chmod +x start_ui.sh
 - **State Management**: TanStack Query (React Query)
 - **HTTP Client**: Axios
 
-## 📊 Data Models
+## Data Models
 
 - **BGPPeering**: BGP peerings with A-side and Z-side endpoints
 - **PeerEndpoint**: Individual peer endpoints with configuration
@@ -88,7 +88,7 @@ chmod +x start_ui.sh
 - **Secret**: Authentication/encryption management
 - **ChangeLog**: Complete audit trail
 
-## 🔧 API Endpoints
+## API Endpoints
 
 ### BGP Peerings
 - `GET /api/bgp-peerings` - List with filters and pagination
@@ -107,7 +107,7 @@ chmod +x start_ui.sh
 
 See `/docs` for complete API documentation when backend is running.
 
-## ✅ Validation Rules
+## Validation Rules
 
 - ASN: 1-4294967295
 - IP Address: IPv4/IPv6 format validation
@@ -118,7 +118,7 @@ See `/docs` for complete API documentation when backend is running.
 - Hold Time: 0 or 3-65535
 - Keepalive: Must be less than hold time
 
-## 🎨 UI Features
+## UI Features
 
 - Dashboard with statistics and change log
 - BGP Peerings list with advanced filtering
@@ -129,7 +129,7 @@ See `/docs` for complete API documentation when backend is running.
 - Export functionality
 - Responsive design for mobile and desktop
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 .
@@ -152,14 +152,14 @@ See `/docs` for complete API documentation when backend is running.
 └── README.md
 ```
 
-## 🔒 Security
+## Security
 
 - Input validation on all endpoints
 - SQL injection protection (SQLAlchemy ORM)
 - CORS configuration
 - Secret encryption ready (implement in production)
 
-## 🚧 Future Enhancements
+## Future Enhancements
 
 - Real-time updates with WebSockets
 - Graph/Topology visualization UI
@@ -169,10 +169,10 @@ See `/docs` for complete API documentation when backend is running.
 - Authentication and authorization
 - Role-based access control
 
-## 📝 License
+## License
 
 Open source - use as needed.
 
-## 🤝 Contributing
+## Contributing
 
 This is a production-ready reference implementation. Feel free to extend and customize for your needs.

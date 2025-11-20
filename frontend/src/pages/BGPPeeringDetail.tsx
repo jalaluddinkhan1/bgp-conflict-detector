@@ -1,7 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, Link } from 'react-router-dom';
-import { Search, Edit, Trash2, Info } from 'lucide-react';
 import { apiClient } from '@/lib/api';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -48,15 +47,13 @@ const BGPPeeringDetailPage: React.FC = () => {
               className="px-3 py-1.5 border border-gray-300 rounded text-sm"
             />
             <button className="bg-gray-100 text-gray-700 px-3 py-1.5 rounded hover:bg-gray-200">
-              <Search size={16} />
+              Search
             </button>
           </div>
           <Button variant="warning" size="sm">
-            <Edit size={16} className="mr-2" />
             Edit
           </Button>
           <Button variant="danger" size="sm">
-            <Trash2 size={16} className="mr-2" />
             Delete
           </Button>
         </div>
@@ -128,14 +125,14 @@ const BGPPeeringDetailPage: React.FC = () => {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900">Peer Endpoint - A Side</h2>
               <div className="flex space-x-1">
-                <button className="p-1 text-blue-600 hover:bg-blue-50 rounded">
-                  <Info size={16} />
+                <button className="p-1 text-blue-600 hover:bg-blue-50 rounded text-sm">
+                  Info
                 </button>
-                <button className="p-1 text-orange-600 hover:bg-orange-50 rounded">
-                  <Edit size={16} />
+                <button className="p-1 text-orange-600 hover:bg-orange-50 rounded text-sm">
+                  Edit
                 </button>
-                <button className="p-1 text-red-600 hover:bg-red-50 rounded">
-                  <Trash2 size={16} />
+                <button className="p-1 text-red-600 hover:bg-red-50 rounded text-sm">
+                  Delete
                 </button>
               </div>
             </div>
@@ -186,14 +183,14 @@ const BGPPeeringDetailPage: React.FC = () => {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900">Peer Endpoint - Z Side</h2>
               <div className="flex space-x-1">
-                <button className="p-1 text-blue-600 hover:bg-blue-50 rounded">
-                  <Info size={16} />
+                <button className="p-1 text-blue-600 hover:bg-blue-50 rounded text-sm">
+                  Info
                 </button>
-                <button className="p-1 text-orange-600 hover:bg-orange-50 rounded">
-                  <Edit size={16} />
+                <button className="p-1 text-orange-600 hover:bg-orange-50 rounded text-sm">
+                  Edit
                 </button>
-                <button className="p-1 text-red-600 hover:bg-red-50 rounded">
-                  <Trash2 size={16} />
+                <button className="p-1 text-red-600 hover:bg-red-50 rounded text-sm">
+                  Delete
                 </button>
               </div>
             </div>

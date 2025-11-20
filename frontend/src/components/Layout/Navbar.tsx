@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ChevronRight, Search, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const Navbar: React.FC = () => {
@@ -15,12 +14,12 @@ const Navbar: React.FC = () => {
       label: 'Routing',
       path: '/routing',
       dropdown: [
-        { label: 'Autonomous Systems', path: '/routing/autonomous-systems', icon: '+' },
-        { label: 'Peering Roles', path: '/routing/peering-roles', icon: '+' },
-        { label: 'Peer Group Templates', path: '/routing/peer-group-templates', icon: '+' },
-        { label: 'Routing Instances', path: '/routing/routing-instances', icon: '+' },
-        { label: 'Peer Groups', path: '/routing/peer-groups', icon: '+' },
-        { label: 'Peerings', path: '/routing/bgp-peerings', icon: '+' },
+        { label: 'Autonomous Systems', path: '/routing/autonomous-systems' },
+        { label: 'Peering Roles', path: '/routing/peering-roles' },
+        { label: 'Peer Group Templates', path: '/routing/peer-group-templates' },
+        { label: 'Routing Instances', path: '/routing/routing-instances' },
+        { label: 'Peer Groups', path: '/routing/peer-groups' },
+        { label: 'Peerings', path: '/routing/bgp-peerings' },
       ],
     },
     { label: 'Virtualization', path: '/virtualization' },
@@ -38,11 +37,6 @@ const Navbar: React.FC = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-8">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="flex items-center space-x-1 text-orange-500">
-                <ChevronRight size={20} />
-                <ChevronRight size={20} />
-                <ChevronRight size={20} />
-              </div>
               <span className="bg-blue-600 text-white px-3 py-1 rounded-full font-semibold">
                 nautobot
               </span>
@@ -78,9 +72,6 @@ const Navbar: React.FC = () => {
                               className="flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                             >
                               <span>{dropdownItem.label}</span>
-                              {dropdownItem.icon && (
-                                <span className="text-green-500 font-bold">{dropdownItem.icon}</span>
-                              )}
                             </Link>
                           </div>
                         ))}
@@ -100,11 +91,10 @@ const Navbar: React.FC = () => {
                 className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button className="bg-blue-600 text-white px-3 py-1.5 rounded-md hover:bg-blue-700">
-                <Search size={16} />
+                Search
               </button>
             </div>
             <div className="flex items-center space-x-2 text-gray-700">
-              <User size={18} />
               <span className="text-sm">admin</span>
             </div>
           </div>
