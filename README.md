@@ -1,457 +1,178 @@
-# BGP Conflict Detection System
+# Nautobot-Style BGP Management Platform
 
-A production-grade system for detecting concurrent BGP configuration changes to prevent conflicts in network automation workflows. This system integrates with Infrahub and GitLab CI/CD to provide real-time conflict detection and automated validation of BGP session modifications.
+A production-ready, feature-complete web application for managing BGP (Border Gateway Protocol) network infrastructure with a modern, intuitive UI inspired by Nautobot.
 
-## Overview
+## 🚀 Features
 
-The BGP Conflict Detection System addresses a critical problem in network operations: concurrent modifications to BGP configurations by multiple engineers can lead to network outages, routing inconsistencies, and deployment failures. This system provides automated detection of such conflicts before they reach production, enabling coordination between engineering teams and preventing service disruptions.
+- **Complete BGP Management**: Peerings, Peer Groups, Peer Endpoints, Autonomous Systems
+- **Advanced Features**: Address Families (AFI-SAFI), Routing Policies, Session State Tracking
+- **Modern UI**: React + TypeScript + Tailwind CSS with responsive design
+- **Comprehensive API**: RESTful FastAPI backend with validation
+- **Bulk Operations**: Multi-select, bulk edit, bulk delete
+- **Export**: CSV and JSON export functionality
+- **Search & Filter**: Advanced filtering by role, status, state, device, tags
+- **Relationship Views**: Topology visualization and peer discovery
+- **Audit Trail**: Complete change log with field-level tracking
+- **Tags System**: Flexible categorization with color coding
 
-## Architecture
+## 📋 Quick Start
 
-The system operates on a three-tier architecture:
+### Prerequisites
+- Python 3.11+
+- Node.js 18+
+- npm
 
-1. **Change Detection Layer**: Monitors Git repositories for BGP configuration changes and queries Infrahub for recent modifications
-2. **Conflict Analysis Engine**: Compares temporal changes across multiple sources to identify potential conflicts
-3. **Integration Layer**: Provides REST API endpoints and GitLab CI/CD integration for automated validation
-
-### Core Components
-
-- **Conflict Detection Engine**: Python-based service that analyzes BGP session and route-map modifications
-- **Infrahub Integration**: GraphQL and REST API clients for querying network state
-- **GitLab CI/CD Pipeline**: Automated validation on merge requests
-- **REST API Service**: FastAPI-based service for programmatic conflict checking
-- **Test Framework**: Comprehensive test suite with simulation capabilities
-
-## Features
-
-### Conflict Detection
-
-- **Direct Session Conflicts**: Identifies when the same BGP session is modified by multiple engineers within a configurable time window
-- **Route-Map Collisions**: Detects when route-map changes affect multiple BGP peers simultaneously
-- **Policy Conflicts**: Identifies conflicts between network-wide and device-specific policy changes
-- **Temporal Analysis**: Configurable time windows (default: 5 minutes) to reduce false positives
-
-### Integration Capabilities
-
-- **GitLab CI/CD**: Automatic validation on merge requests with detailed conflict reports
-- **REST API**: Programmatic access for custom integrations and automation
-- **Infrahub Integration**: Real-time querying of network state and recent changes
-- **Artifact Generation**: JSON reports compatible with CI/CD artifact systems
-
-### Testing and Validation
-
-- Comprehensive test suite with five realistic conflict scenarios
-- Simulation tools for concurrent change testing
-- Automated demo runner for validation
-- Test data loader for development environments
-
-## Requirements
-
-### System Requirements
-
-- Python 3.11 or higher
-- Docker Desktop (for full system deployment)
-- Docker Compose 2.0 or higher
-- Git 2.0 or higher
-
-### Dependencies
-
-- Infrahub SDK 1.15.1+
-- FastAPI 0.104.1+
-- GraphQL Client 4.0.0+
-- HTTPX 0.25.2+
-- PyYAML 6.0.1+
-
-## Installation
-
-### Quick Start
-
-For demonstration purposes without Docker:
+### Backend Setup
 
 ```bash
-python demo_without_docker.py
-```
-
-### Full System Installation
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/jalaluddinkhan1/bgp-conflict-detector.git
-cd bgp-conflict-detector
-```
-
-2. Install Python dependencies:
-
-```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
+python -c "from database import init_db; init_db()"
+python seed_data.py
+python run.py
 ```
 
-3. Start infrastructure services:
+Backend runs on: `http://localhost:8000`
+
+### Frontend Setup
 
 ```bash
-docker-compose up -d
+cd frontend
+npm install
+npm run dev
 ```
 
-4. Wait for Infrahub to initialize (approximately 30-60 seconds):
+Frontend runs on: `http://localhost:3000`
+
+### Automated Start (Windows)
+
+```powershell
+.\start_ui.ps1
+```
+
+### Automated Start (Linux/Mac)
 
 ```bash
-curl http://localhost:8000/api/info
+chmod +x start_ui.sh
+./start_ui.sh
 ```
 
-5. Load BGP schema:
+## 🏗️ Architecture
 
-```bash
-infrahubctl schema load schemas/bgp.yml
-```
+### Backend
+- **Framework**: FastAPI (Python)
+- **ORM**: SQLAlchemy
+- **Database**: SQLite (easily upgradeable to PostgreSQL)
+- **Validation**: Pydantic schemas with custom validators
 
-6. Load test data:
+### Frontend
+- **Framework**: React 18 with TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS
+- **State Management**: TanStack Query (React Query)
+- **HTTP Client**: Axios
 
-```bash
-python scripts/load_test_data.py
-```
+## 📊 Data Models
 
-7. Run validation tests:
+- **BGPPeering**: BGP peerings with A-side and Z-side endpoints
+- **PeerEndpoint**: Individual peer endpoints with configuration
+- **PeerGroup**: Peer groups with templates and policies
+- **AutonomousSystem**: AS management with RIR support
+- **RoutingInstance**: Per-device BGP instances
+- **AddressFamily**: AFI-SAFI support (IPv4, IPv6, VPNv4, L2VPN-EVPN)
+- **RoutingPolicy**: Structured routing policies with rules
+- **BGPSessionState**: Real-time session state tracking
+- **Tag**: Flexible tagging system
+- **Secret**: Authentication/encryption management
+- **ChangeLog**: Complete audit trail
 
-```bash
-python scripts/run_all_demos.py
-```
+## 🔧 API Endpoints
 
-## Configuration
+### BGP Peerings
+- `GET /api/bgp-peerings` - List with filters and pagination
+- `GET /api/bgp-peerings/{id}` - Get details
+- `POST /api/bgp-peerings` - Create new peering
+- `DELETE /api/bgp-peerings/{id}` - Delete peering
+- `POST /api/bgp-peerings/bulk-delete` - Bulk delete
+- `PUT /api/bgp-peerings/bulk-update` - Bulk update
+- `GET /api/bgp-peerings/export/csv` - Export CSV
+- `GET /api/bgp-peerings/export/json` - Export JSON
+- `GET /api/bgp-peerings/topology` - Get topology graph
 
-### Environment Variables
+### Other Entities
+- Address Families, Routing Policies, Tags, Secrets, Session States
+- Peer Groups, Peer Endpoints, Autonomous Systems, Devices
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `INFRAHUB_URL` | No | `http://localhost:8000` | Infrahub server URL |
-| `INFRAHUB_TOKEN` | Yes | None | Infrahub API authentication token |
-| `GITLAB_TOKEN` | No | None | GitLab API token for merge request comments |
-| `CONFLICT_WINDOW_MINUTES` | No | `5` | Time window for conflict detection in minutes |
-| `GIT_DIFF_FILES` | No | Empty | Space-separated list of changed files for analysis |
+See `/docs` for complete API documentation when backend is running.
 
-### Infrahub Token Configuration
+## ✅ Validation Rules
 
-The system requires an Infrahub API token for authentication. Configure the token using one of the following methods:
+- ASN: 1-4294967295
+- IP Address: IPv4/IPv6 format validation
+- Peering Name: Uniqueness check
+- Endpoint Relationship: A and Z must be different
+- BGP State: Valid state transitions
+- AFI-SAFI: Valid combinations
+- Hold Time: 0 or 3-65535
+- Keepalive: Must be less than hold time
 
-1. Environment variable:
-```bash
-export INFRAHUB_TOKEN="your-token-here"
-```
+## 🎨 UI Features
 
-2. Docker Compose environment:
-```yaml
-environment:
-  INFRAHUB_TOKEN: "your-token-here"
-```
+- Dashboard with statistics and change log
+- BGP Peerings list with advanced filtering
+- Detail views for all entities
+- Session state monitoring with real-time stats
+- Tag management with color coding
+- Bulk operations interface
+- Export functionality
+- Responsive design for mobile and desktop
 
-3. Command-line argument:
-```bash
-python scripts/detect_bgp_conflicts.py --infrahub-token "your-token-here"
-```
-
-For detailed token setup instructions, refer to `API_KEYS.md`.
-
-## Usage
-
-### Command-Line Interface
-
-Basic conflict detection:
-
-```bash
-python scripts/detect_bgp_conflicts.py \
-  --diff-files "configs/bgp/routers/router01.yaml" \
-  --window-minutes 5 \
-  --infrahub-url http://localhost:8000 \
-  --infrahub-token your-token-here
-```
-
-### REST API
-
-Start the API service:
-
-```bash
-docker-compose up -d conflict_api
-```
-
-Check for conflicts:
-
-```bash
-curl -X POST http://localhost:8001/bgp/check-conflicts \
-  -H "Content-Type: application/json" \
-  -d '{
-    "device_names": ["router01", "router02"],
-    "time_window_minutes": 5,
-    "check_route_maps": true
-  }'
-```
-
-API Response:
-
-```json
-{
-  "conflicts_found": true,
-  "conflict_count": 1,
-  "conflicts": [
-    {
-      "type": "bgp_session_recently_modified",
-      "session_name": "router01_192.168.1.2",
-      "device": "router01",
-      "peer_ip": "192.168.1.2",
-      "changed_by": "engineer@company.com",
-      "changed_at": "2025-01-19T10:30:00Z"
-    }
-  ],
-  "checked_at": "2025-01-19T10:35:00Z"
-}
-```
-
-### GitLab CI/CD Integration
-
-Add to your `.gitlab-ci.yml`:
-
-```yaml
-include:
-  - project: 'your-group/bgp-conflict-detector'
-    file: '.gitlab-ci.yml'
-
-variables:
-  INFRAHUB_URL: "https://infrahub.yourcompany.com"
-  INFRAHUB_TOKEN: "${INFRAHUB_TOKEN}"
-```
-
-The system will automatically:
-- Analyze changed files in merge requests
-- Query Infrahub for recent modifications
-- Post conflict warnings as MR comments
-- Fail the pipeline if high-severity conflicts are detected
-- Generate JSON reports as CI artifacts
-
-## Project Structure
+## 📁 Project Structure
 
 ```
-bgp-conflict-detector/
-├── api/
-│   ├── bgp_conflict_api.py      # FastAPI REST service
-│   ├── Dockerfile                # API container definition
-│   └── requirements.txt          # API dependencies
-├── configs/
-│   └── bgp/
-│       └── routers/              # BGP router configurations
-│           ├── router01.yaml
-│           └── router02.yaml
-├── schemas/
-│   └── bgp.yml                   # Infrahub BGP schema definition
-├── scripts/
-│   ├── detect_bgp_conflicts.py   # Main conflict detection engine
-│   ├── load_test_data.py         # Test data loader
-│   ├── run_all_demos.py          # Test orchestrator
-│   ├── simulate_concurrent_change.py  # Concurrent change simulator
-│   └── simulate_flapping.py      # BGP session flapping simulator
-├── tests/
-│   └── test_scenarios.yml        # Test scenario documentation
-├── docker-compose.yml            # Infrastructure orchestration
-├── .gitlab-ci.yml                # CI/CD pipeline configuration
-├── requirements.txt              # Python dependencies
-└── README.md                     # This file
+.
+├── backend/
+│   ├── models.py          # SQLAlchemy models
+│   ├── schemas.py         # Pydantic schemas
+│   ├── main.py            # FastAPI application
+│   ├── database.py        # Database configuration
+│   ├── validators.py      # Validation rules
+│   └── seed_data.py       # Initial data
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/    # React components
+│   │   ├── pages/         # Page components
+│   │   ├── lib/           # Utilities and API
+│   │   └── App.tsx        # Main app
+│   └── package.json
+│
+└── README.md
 ```
 
-## Conflict Detection Algorithm
+## 🔒 Security
 
-The system employs a temporal conflict detection algorithm:
+- Input validation on all endpoints
+- SQL injection protection (SQLAlchemy ORM)
+- CORS configuration
+- Secret encryption ready (implement in production)
 
-1. **Change Extraction**: Parse Git diff to identify modified BGP sessions and route-maps
-2. **Temporal Query**: Query Infrahub for changes within the configured time window
-3. **Conflict Analysis**: Compare Git changes with Infrahub changes to identify:
-   - Direct session conflicts (same session modified)
-   - Route-map collisions (shared route-maps affected)
-   - Policy conflicts (network-wide vs device-specific)
-4. **Severity Assessment**: Classify conflicts as HIGH or MEDIUM severity
-5. **Reporting**: Generate detailed reports with conflict metadata
+## 🚧 Future Enhancements
 
-### Time Window Configuration
+- Real-time updates with WebSockets
+- Graph/Topology visualization UI
+- Advanced policy rule builder
+- Health monitoring dashboard
+- Alerting system
+- Authentication and authorization
+- Role-based access control
 
-The default conflict detection window is 5 minutes. Changes older than this window are ignored to reduce false positives. This window can be configured via the `CONFLICT_WINDOW_MINUTES` environment variable or command-line argument.
+## 📝 License
 
-## Testing
+Open source - use as needed.
 
-### Test Scenarios
+## 🤝 Contributing
 
-The system includes five comprehensive test scenarios:
-
-1. **Concurrent ASN Change**: Two engineers modify the same peer ASN simultaneously
-2. **Route Map Collision**: Route-map changes affect multiple peers
-3. **False Positive Prevention**: Old changes (>5 minutes) do not trigger conflicts
-4. **Multi-Device Policy Conflict**: Network-wide changes conflict with device-specific modifications
-5. **Flapping Session Block**: Unstable sessions block new changes
-
-### Running Tests
-
-Execute the complete test suite:
-
-```bash
-python scripts/run_all_demos.py
-```
-
-Run individual test scenarios:
-
-```bash
-python scripts/simulate_concurrent_change.py \
-  --session router01_192.168.1.2 \
-  --field peer_asn \
-  --value 65099
-```
-
-## API Documentation
-
-### Endpoints
-
-#### Health Check
-
-```http
-GET /health
-```
-
-Returns service health status and cache statistics.
-
-#### Check Conflicts
-
-```http
-POST /bgp/check-conflicts
-Content-Type: application/json
-```
-
-Request body:
-
-```json
-{
-  "device_names": ["router01", "router02"],
-  "time_window_minutes": 5,
-  "check_route_maps": true
-}
-```
-
-Response:
-
-```json
-{
-  "conflicts_found": boolean,
-  "conflict_count": integer,
-  "conflicts": [
-    {
-      "type": "string",
-      "session_id": "string",
-      "session_name": "string",
-      "device": "string",
-      "peer_ip": "string",
-      "changed_by": "string",
-      "changed_at": "string"
-    }
-  ],
-  "checked_at": "string"
-}
-```
-
-## Deployment
-
-### Docker Compose Deployment
-
-The system includes a complete Docker Compose configuration for local development and testing:
-
-```bash
-docker-compose up -d
-```
-
-This starts:
-- Infrahub (port 8000)
-- Memgraph database (port 7687)
-- RabbitMQ message queue (ports 5672, 15672)
-- Redis cache (port 6379)
-- Conflict Detection API (port 8001)
-
-### Production Deployment
-
-For production deployments, consider:
-
-- Kubernetes deployment with proper resource limits
-- External Infrahub instance configuration
-- Secure token management via secrets management systems
-- High availability configuration for API service
-- Monitoring and logging integration
-
-## Performance Considerations
-
-- Conflict detection queries are optimized for sub-second response times
-- GraphQL queries are used for efficient data retrieval from Infrahub
-- In-memory caching reduces redundant API calls
-- Time-windowed queries minimize database load
-
-## Security
-
-- API tokens are never logged or exposed in error messages
-- Environment variables are used for sensitive configuration
-- GitLab CI/CD variables should be marked as protected and masked
-- Token rotation is recommended for production deployments
-
-## Troubleshooting
-
-### Common Issues
-
-**Infrahub Connection Failures**
-
-Verify Infrahub is running and accessible:
-
-```bash
-curl http://localhost:8000/api/info
-```
-
-Check token validity:
-
-```bash
-python -c "from infrahub_sdk import InfrahubClientSync; client = InfrahubClientSync(address='http://localhost:8000', token='your-token'); print('Connected')"
-```
-
-**Docker Service Issues**
-
-Check service status:
-
-```bash
-docker-compose ps
-```
-
-View logs:
-
-```bash
-docker-compose logs infrahub
-```
-
-**Python Package Errors**
-
-Reinstall dependencies:
-
-```bash
-pip install --upgrade -r requirements.txt
-```
-
-## Contributing
-
-Contributions are welcome. Please follow these guidelines:
-
-1. Fork the repository
-2. Create a feature branch from `main`
-3. Implement changes with appropriate tests
-4. Ensure all tests pass: `python scripts/run_all_demos.py`
-5. Submit a pull request with a clear description of changes
-
-## License
-
-This project is licensed under the MIT License.
-
-## References
-
-- [Infrahub Documentation](https://github.com/opsmill/infrahub)
-- [FastAPI Documentation](https://fastapi.tiangolo.com/)
-- [GitLab CI/CD Documentation](https://docs.gitlab.com/ee/ci/)
-
-## Support
-
-For issues, questions, or contributions, please use the GitHub issue tracker.
+This is a production-ready reference implementation. Feel free to extend and customize for your needs.
