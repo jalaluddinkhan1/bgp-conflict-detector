@@ -437,13 +437,6 @@ Details:
         Returns:
             True if remediation successful, False otherwise
         """
-        # TODO: Implement auto-remediation logic
-        # This could involve:
-        # - Updating route filters
-        # - Withdrawing routes
-        # - Notifying upstream providers
-        # - Updating BGP policies
-        
         logger.info("Auto-remediation attempted", hijack_details=hijack_details)
         return False  # Placeholder
     

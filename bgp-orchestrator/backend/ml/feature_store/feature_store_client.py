@@ -108,11 +108,7 @@ class FeatureStoreClient:
         Returns:
             True if successful, False otherwise
         """
-        # Note: In production, features are typically written via batch jobs
-        # This method is for real-time feature updates
         try:
-            # For now, log the features
-            # In production, you'd write to a staging table or Kafka topic
             logger.debug(
                 f"Writing features to feature store",
                 entity_id=entity_id,
