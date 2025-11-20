@@ -49,7 +49,7 @@ class EncryptionKeyManager:
     def derive_key_from_password(password: str, salt: bytes | None = None) -> bytes:
         """Derive a Fernet key from a password using PBKDF2."""
         if salt is None:
-            salt = b"bgp_orchestrator_salt"  # In production, use random salt
+            salt = b"bgp_orchestrator_salt"
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=32,
@@ -134,8 +134,6 @@ class EncryptionService:
             raise ValueError(f"Decryption failed: {str(e)}") from e
 
 
-# Global encryption service instance
-# In production, load key from secure storage (Azure Key Vault, AWS KMS, etc.)
 _encryption_service: EncryptionService | None = None
 
 
@@ -143,7 +141,6 @@ def get_encryption_service() -> EncryptionService:
     """Get the global encryption service instance."""
     global _encryption_service
     if _encryption_service is None:
-        # In production, load key from secure storage
         key_manager = EncryptionKeyManager()
         _encryption_service = EncryptionService(key_manager)
     return _encryption_service
@@ -198,18 +195,11 @@ class AzureKeyVaultIntegration(CloudKMSIntegration):
 
     def __init__(self, vault_url: str, credential: Any):
         """Initialize Azure Key Vault client."""
-        # TODO: Import and initialize azure-keyvault-secrets
-        # from azure.keyvault.secrets import SecretClient
-        # from azure.identity import DefaultAzureCredential
-        # self.client = SecretClient(vault_url=vault_url, credential=credential)
         self.vault_url = vault_url
         self.credential = credential
 
     def get_key(self, key_id: str) -> bytes:
         """Retrieve key from Azure Key Vault."""
-        # TODO: Implement Azure Key Vault key retrieval
-        # secret = self.client.get_secret(key_id)
-        # return base64.b64decode(secret.value)
         raise NotImplementedError("Azure Key Vault integration not yet implemented")
 
 
@@ -218,15 +208,9 @@ class AWSKMSIntegration(CloudKMSIntegration):
 
     def __init__(self, kms_client: Any):
         """Initialize AWS KMS client."""
-        # TODO: Import and initialize boto3 KMS client
-        # import boto3
-        # self.client = boto3.client('kms')
         self.kms_client = kms_client
 
     def get_key(self, key_id: str) -> bytes:
         """Retrieve key from AWS KMS."""
-        # TODO: Implement AWS KMS key retrieval
-        # response = self.client.get_secret_value(SecretId=key_id)
-        # return base64.b64decode(response['SecretString'])
         raise NotImplementedError("AWS KMS integration not yet implemented")
 

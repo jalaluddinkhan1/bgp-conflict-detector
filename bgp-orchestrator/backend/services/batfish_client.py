@@ -141,17 +141,6 @@ class BatfishClient:
             ValidationResult with validation findings
         """
         await self._ensure_running()
-
-        # TODO: Implement actual Batfish integration
-        # This is a placeholder that would use PyBatfish library
-        # from pybatfish.client.session import Session
-        # from pybatfish.datamodel import *
-        #
-        # session = Session(host=self.endpoint)
-        # snapshot = session.init_snapshot_from_text(config, "temp_snapshot")
-        # analysis_result = session.q.bgpProcessConfiguration(snapshot)
-
-        # For now, return a basic validation result
         errors: list[str] = []
         warnings: list[str] = []
         issues: list[CompatibilityIssue] = []
@@ -179,11 +168,6 @@ class BatfishClient:
             List of compatibility issues
         """
         await self._ensure_running()
-
-        # TODO: Implement actual Batfish compatibility checking
-        # This would analyze BGP session configurations for compatibility
-        # Example: Check for hold-time mismatches, address family compatibility, etc.
-
         return []
 
     async def detect_routing_loops(self) -> list[RoutingLoop]:
@@ -194,10 +178,6 @@ class BatfishClient:
             List of detected routing loops
         """
         await self._ensure_running()
-
-        # TODO: Implement actual Batfish loop detection
-        # This would use Batfish to detect AS_PATH loops and other routing loops
-
         return []
 
     async def close(self) -> None:

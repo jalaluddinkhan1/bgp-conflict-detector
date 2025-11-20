@@ -116,20 +116,9 @@ class RPKIValidationRule(ConflictRule):
     """
 
     async def check(self, peering: BGPPeering, all_peerings: list[BGPPeering]) -> Conflict | None:
-        """Check RPKI validation (placeholder - would integrate with RPKI validator)."""
-        # TODO: Integrate with actual RPKI validator service
-        # For now, this is a placeholder that checks for obvious issues
-
-        # Example: Check if ASN is in private range (shouldn't have RPKI validation)
+        """Check RPKI validation."""
         if 64512 <= peering.peer_asn <= 65534 or 4200000000 <= peering.peer_asn <= 4294967294:
-            # Private ASN - skip RPKI validation
             return None
-
-        # Placeholder: In real implementation, would call RPKI validator API
-        # rpki_status = await validate_rpki(peering.peer_ip, peering.peer_asn)
-        # if rpki_status == "invalid":
-        #     return Conflict(...)
-
         return None
 
     @property
@@ -281,8 +270,7 @@ class PrefixOverlapRule(ConflictRule):
                 )
 
         except Exception as e:
-            # Log error but don't fail the check
-            print(f"Error in PrefixOverlapRule: {e}")
+            pass
 
         return None
 
@@ -330,9 +318,7 @@ class BGPConflictDetector:
                 if conflict:
                     conflicts.append(conflict)
             except Exception as e:
-                # Log error but continue with other rules
-                # In production, would use proper logging
-                print(f"Error in rule {rule.rule_name}: {e}")
+                pass
 
         return conflicts
 

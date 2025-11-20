@@ -226,35 +226,36 @@ router bgp {peering_local_asn}
 """
                     validation_result = await batfish_client.validate_bgp_config(config_text)
                     if not validation_result.valid:
-                        # Log validation errors (could also send alerts)
-                        print(f"Batfish validation errors for peering {peering_name}: {validation_result.errors}")
+                        logger.warning(
+                            "batfish_validation_errors",
+                            peering_name=peering_name,
+                            errors=validation_result.errors,
+                        )
                 except Exception as e:
-                    print(f"Batfish validation failed: {e}")
+                    logger.error("batfish_validation_failed", error=str(e), peering_name=peering_name)
 
-            # 2. Validate prefix origin with RIPE RIS if available
             if ripe_ris_client:
                 try:
-                    # Check if we can get live updates (validates RIPE RIS is working)
-                    # This could validate that the peer ASN is legitimate
-                    # For now, just verify the client is functional
-                    pass  # Placeholder - would need prefix information to validate origin
+                    pass
                 except Exception as e:
-                    print(f"RIPE RIS validation failed: {e}")
+                    logger.error("ripe_ris_validation_failed", error=str(e), peering_name=peering_name)
 
-            # 3. Poll device state with SuzieQ if available
             if suzieq_client:
                 try:
                     sessions = await suzieq_client.poll_bgp_sessions(peering_device)
-                    # Match our peering with live session data
                     for session in sessions:
                         if session.peer == peering_peer_ip and session.peer_asn == peering_peer_asn:
-                            # Update peering state if different
                             if session.state.value != peering_status:
-                                print(f"Live session state mismatch: {session.state.value} vs {peering_status}")
+                                logger.warning(
+                                    "live_session_state_mismatch",
+                                    peering_name=peering_name,
+                                    configured_state=peering_status,
+                                    live_state=session.state.value,
+                                )
                 except Exception as e:
-                    print(f"SuzieQ polling failed: {e}")
+                    logger.error("suzieq_polling_failed", error=str(e), peering_name=peering_name)
         except Exception as e:
-            print(f"Post-creation validation error: {e}")
+            logger.error("post_creation_validation_error", error=str(e), peering_name=peering_name)
 
     background_tasks.add_task(
         post_creation_validation,

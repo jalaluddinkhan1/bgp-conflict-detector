@@ -297,14 +297,14 @@ If VictoriaMetrics forwarding fails:
 
 ## Summary
 
-✅ **Completed:**
+**Completed:**
 - Alembic migration setup
 - Migration script for anomalies table
 - VictoriaMetrics client and integration
 - Model auto-training on first use
 - All API endpoints functional
 
-📋 **To Do:**
+**To Do:**
 1. Run database migration
 2. (Optional) Set up VictoriaMetrics
 3. Test ML predictions

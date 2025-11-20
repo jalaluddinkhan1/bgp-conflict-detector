@@ -83,7 +83,6 @@ class BGPPeering(Base):
     updated_by = Column(String(255), nullable=True, comment="User who last updated the peering")
 
     # Relationships
-    # Note: Assuming audit_log and tags tables exist elsewhere
     # audit_logs = relationship("AuditLog", back_populates="peering", cascade="all, delete-orphan")
     # tags = relationship("Tag", secondary="peering_tags", back_populates="peerings")
 

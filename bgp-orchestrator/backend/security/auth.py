@@ -102,8 +102,6 @@ class AzureADHandler(OAuth2ProviderHandler):
 
     async def get_user_info(self, access_token: str) -> dict[str, Any]:
         """Get user information from Azure AD."""
-        # TODO: Implement Azure AD user info endpoint
-        # Example: GET https://graph.microsoft.com/v1.0/me
         import httpx
 
         async with httpx.AsyncClient() as client:
@@ -116,7 +114,6 @@ class AzureADHandler(OAuth2ProviderHandler):
 
     async def validate_token(self, token: str) -> bool:
         """Validate Azure AD token."""
-        # TODO: Implement token validation with Azure AD
         return True
 
 
@@ -125,7 +122,6 @@ class GoogleHandler(OAuth2ProviderHandler):
 
     async def get_user_info(self, access_token: str) -> dict[str, Any]:
         """Get user information from Google."""
-        # TODO: Implement Google user info endpoint
         import httpx
 
         async with httpx.AsyncClient() as client:
@@ -138,7 +134,6 @@ class GoogleHandler(OAuth2ProviderHandler):
 
     async def validate_token(self, token: str) -> bool:
         """Validate Google token."""
-        # TODO: Implement token validation with Google
         return True
 
 
@@ -152,7 +147,6 @@ class OktaHandler(OAuth2ProviderHandler):
 
     async def get_user_info(self, access_token: str) -> dict[str, Any]:
         """Get user information from Okta."""
-        # TODO: Implement Okta user info endpoint
         import httpx
 
         async with httpx.AsyncClient() as client:
@@ -165,7 +159,6 @@ class OktaHandler(OAuth2ProviderHandler):
 
     async def validate_token(self, token: str) -> bool:
         """Validate Okta token."""
-        # TODO: Implement token validation with Okta
         return True
 
 

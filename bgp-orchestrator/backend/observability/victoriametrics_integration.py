@@ -42,9 +42,6 @@ async def forward_metrics_to_victoriametrics() -> bool:
         # Generate Prometheus format metrics
         metrics_text = generate_latest(registry).decode("utf-8")
         
-        # Parse and forward metrics
-        # Note: This is a simplified implementation. In production, you might
-        # want to use the Prometheus remote write protocol properly.
         metrics_to_write = []
         
         for line in metrics_text.split("\n"):

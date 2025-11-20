@@ -247,8 +247,6 @@ class BGPKafkaConsumer:
             message: BGP update message
             conflicts: Detected conflicts
         """
-        # TODO: Create a BGPUpdate model if needed
-        # For now, we'll log the update
         logger.debug(
             f"Storing BGP update",
             peer_ip=message.peer_ip,

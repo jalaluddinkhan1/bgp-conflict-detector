@@ -17,11 +17,11 @@ This document summarizes the ML/AI features implemented for the BGP Orchestrator
   - `prefix_count`: Number of prefixes received
 
 ### Features
-- ✅ Synthetic data generation for training
-- ✅ Model versioning (loads from `./models/`)
-- ✅ ONNX export for fast inference
-- ✅ Feature scaling with StandardScaler
-- ✅ Model persistence (pickle format)
+- Synthetic data generation for training
+- Model versioning (loads from `./models/`)
+- ONNX export for fast inference
+- Feature scaling with StandardScaler
+- Model persistence (pickle format)
 
 ### API Endpoints
 - `POST /api/v1/ml/predict` - Predict BGP flap probability
@@ -42,11 +42,11 @@ This document summarizes the ML/AI features implemented for the BGP Orchestrator
   - `interface_errors`: Interface error counts
 
 ### Features
-- ✅ Prophet-based seasonality detection (daily, weekly)
-- ✅ 3-sigma anomaly detection
-- ✅ Severity classification (low, medium, high, critical)
-- ✅ PostgreSQL storage for anomalies
-- ✅ Synthetic data generation for testing
+- Prophet-based seasonality detection (daily, weekly)
+- 3-sigma anomaly detection
+- Severity classification (low, medium, high, critical)
+- PostgreSQL storage for anomalies
+- Synthetic data generation for testing
 
 ### API Endpoints
 - `POST /api/v1/anomalies/detect` - Detect anomalies in time-series data

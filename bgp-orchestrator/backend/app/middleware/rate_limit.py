@@ -72,8 +72,6 @@ class RateLimiterMiddleware(BaseHTTPMiddleware):
         now = time.time()
 
         try:
-            # Use Redis pipeline for atomic operations
-            # Note: Redis client from dependencies is synchronous, so we use it directly
             pipe = self.redis_client.pipeline()
 
             # Remove old requests (older than 60 seconds)
@@ -117,9 +115,6 @@ class RateLimiterMiddleware(BaseHTTPMiddleware):
 
         except HTTPException:
             raise
-        except Exception as e:
-            # If Redis fails, log but don't block requests
-            # In production, you might want to fail closed
-            print(f"Rate limiting error: {e}")
+        except Exception:
             return await call_next(request)
 

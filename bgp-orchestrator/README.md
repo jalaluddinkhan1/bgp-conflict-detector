@@ -256,5 +256,4 @@ Built with:
 
 ---
 
-**Made with ❤️ for Network Engineers**
 

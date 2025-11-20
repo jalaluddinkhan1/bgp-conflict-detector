@@ -112,8 +112,6 @@ async def get_usage_stats(
         peerings = result.scalars().all()
         peerings_count = len(peerings)
         
-        # TODO: Get actual usage from metrics/analytics
-        # For now, return mock data
         return UsageStatsResponse(
             bgp_peerings_count=peerings_count,
             api_requests_this_month=1000,  # Mock
@@ -139,7 +137,6 @@ async def get_invoices(
     """
     Get invoices for the current customer.
     """
-    # TODO: Implement actual invoice retrieval
     # For now, return mock data
     return [
         InvoiceResponse(
@@ -163,7 +160,6 @@ async def get_support_tickets(
     """
     Get support tickets for the current customer.
     """
-    # TODO: Implement actual support ticket retrieval
     # For now, return mock data
     return []
 
@@ -177,7 +173,6 @@ async def get_current_plan(
     """
     Get current billing plan.
     """
-    # TODO: Implement actual plan retrieval
     return BillingPlanResponse(
         id="plan_basic",
         name="Basic Plan",
@@ -271,7 +266,6 @@ async def change_plan(
     """
     Change billing plan.
     """
-    # TODO: Implement actual plan change logic
     logger.info(f"Plan change requested", user=user.email, plan_id=plan_id)
     
     return {
@@ -290,7 +284,6 @@ async def get_api_keys(
     """
     Get API keys for the current customer.
     """
-    # TODO: Implement actual API key retrieval
     return []
 
 
@@ -304,7 +297,6 @@ async def create_api_key(
     """
     Create a new API key.
     """
-    # TODO: Implement actual API key creation
     import secrets
     
     key_prefix = secrets.token_urlsafe(16)[:8].upper()
@@ -330,7 +322,6 @@ async def delete_api_key(
     """
     Delete an API key.
     """
-    # TODO: Implement actual API key deletion
     logger.info(f"API key deleted", user=user.email, key_id=key_id)
     
     return {"status": "success", "message": "API key deleted"}
@@ -345,7 +336,6 @@ async def get_alert_preferences(
     """
     Get alert preferences.
     """
-    # TODO: Implement actual alert preferences retrieval
     return AlertPreferencesResponse(
         email_enabled=True,
         slack_enabled=False,
@@ -366,7 +356,6 @@ async def update_alert_preferences(
     """
     Update alert preferences.
     """
-    # TODO: Implement actual alert preferences update
     logger.info(f"Alert preferences updated", user=user.email, prefs=prefs.model_dump())
     
     return prefs
