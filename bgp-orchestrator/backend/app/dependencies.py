@@ -130,28 +130,18 @@ def get_conflict_detector() -> BGPConflictDetector:
     return _conflict_detector
 
 
-# Batfish Client (placeholder)
-class BatfishClient:
-    """Placeholder for Batfish network analysis client."""
-
-    def __init__(self, endpoint: str | None = None):
-        """Initialize Batfish client."""
-        self.endpoint = endpoint or settings.BATFISH_ENDPOINT
-        # TODO: Initialize actual Batfish client
-        # from pybatfish.client.session import Session
-        # self.session = Session(endpoint=self.endpoint)
-
-    async def validate_config(self, config: dict) -> dict:
-        """Validate network configuration."""
-        # TODO: Implement Batfish validation
-        return {"valid": True, "warnings": []}
+# Import real service clients
+from services.batfish_client import BatfishClient
+from services.suzieq_client import SuzieQClient
+from services.ripe_ris_client import RIPEClient
 
 
+# Batfish Client
 _batfish_client: BatfishClient | None = None
 
 
 @lru_cache()
-def get_batfish_client() -> BatfishClient:
+def get_batfish_client() -> BatfishClient | None:
     """
     Get Batfish client instance (singleton).
 
@@ -161,9 +151,50 @@ def get_batfish_client() -> BatfishClient:
             ...
     """
     global _batfish_client
-    if _batfish_client is None:
+    if _batfish_client is None and settings.BATFISH_ENDPOINT:
         _batfish_client = BatfishClient()
     return _batfish_client
+
+
+# SuzieQ Client
+_suzieq_client: SuzieQClient | None = None
+
+
+@lru_cache()
+def get_suzieq_client() -> SuzieQClient | None:
+    """
+    Get SuzieQ client instance (singleton).
+
+    Usage:
+        @app.get("/devices")
+        async def get_devices(client: SuzieQClient = Depends(get_suzieq_client)):
+            ...
+    """
+    global _suzieq_client
+    if _suzieq_client is None and settings.SUZIEQ_ENDPOINT:
+        _suzieq_client = SuzieQClient()
+    return _suzieq_client
+
+
+# RIPE RIS Client
+_ripe_ris_client: RIPEClient | None = None
+
+
+@lru_cache()
+def get_ripe_ris_client() -> RIPEClient | None:
+    """
+    Get RIPE RIS client instance (singleton).
+
+    Usage:
+        @app.get("/bgp-updates")
+        async def get_updates(client: RIPEClient = Depends(get_ripe_ris_client)):
+            ...
+    """
+    global _ripe_ris_client
+    if _ripe_ris_client is None and settings.RIPE_RIS_ENABLED:
+        redis_client = get_redis()
+        _ripe_ris_client = RIPEClient(redis_client=redis_client)
+    return _ripe_ris_client
 
 
 # Async dependencies type hints
@@ -171,5 +202,7 @@ DbSession = Annotated[AsyncSession, Depends(get_db)]
 RedisClient = Annotated[Redis, Depends(get_redis)]
 CurrentUser = Annotated[User, Depends(get_current_user)]
 ConflictDetector = Annotated[BGPConflictDetector, Depends(get_conflict_detector)]
-BatfishClientDep = Annotated[BatfishClient, Depends(get_batfish_client)]
+BatfishClientDep = Annotated[BatfishClient | None, Depends(get_batfish_client)]
+SuzieQClientDep = Annotated[SuzieQClient | None, Depends(get_suzieq_client)]
+RIPEClientDep = Annotated[RIPEClient | None, Depends(get_ripe_ris_client)]
 

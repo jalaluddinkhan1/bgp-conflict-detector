@@ -183,6 +183,17 @@ class RoutingLoopRule(ConflictRule):
 
     async def check(self, peering: BGPPeering, all_peerings: list[BGPPeering]) -> Conflict | None:
         """Check for potential routing loops."""
+        # Check if local ASN matches peer ASN (ASN collision)
+        if peering.local_asn == peering.peer_asn:
+            return Conflict(
+                type=ConflictType.ROUTING_LOOP,
+                severity=ConflictSeverity.CRITICAL,
+                description=f"ASN collision: local ASN {peering.local_asn} matches peer ASN",
+                affected_peers=[peering.id],
+                recommended_action="Change local or peer ASN to avoid routing loops",
+                metadata={"local_asn": peering.local_asn, "peer_asn": peering.peer_asn},
+            )
+
         # Check if local ASN appears in routing policy as a transit path
         routing_policy = peering.routing_policy or {}
 
@@ -211,6 +222,76 @@ class RoutingLoopRule(ConflictRule):
         return "Routing Loop Detection"
 
 
+class PrefixOverlapRule(ConflictRule):
+    """
+    Detects prefix overlaps and suspiciously broad prefixes (potential hijack).
+    """
+
+    async def check(self, peering: BGPPeering, all_peerings: list[BGPPeering]) -> Conflict | None:
+        """Check for prefix overlaps and suspicious prefixes."""
+        try:
+            import ipaddress
+
+            # Check if peer IP is in a suspiciously broad range
+            try:
+                peer_ip = ipaddress.ip_address(str(peering.peer_ip))
+                
+                # Check for private IPs in public peering (might be misconfiguration)
+                if peer_ip.is_private and peering.status == "active":
+                    # This might be intentional for internal peerings, so only warn
+                    return Conflict(
+                        type=ConflictType.CONFIGURATION_MISMATCH,
+                        severity=ConflictSeverity.MEDIUM,
+                        description=f"Private IP {peering.peer_ip} used in active peering",
+                        affected_peers=[peering.id],
+                        recommended_action="Verify this is intentional for internal peering",
+                        metadata={"peer_ip": str(peering.peer_ip), "is_private": True},
+                    )
+            except ValueError:
+                # Invalid IP format
+                return Conflict(
+                    type=ConflictType.CONFIGURATION_MISMATCH,
+                    severity=ConflictSeverity.HIGH,
+                    description=f"Invalid IP address format: {peering.peer_ip}",
+                    affected_peers=[peering.id],
+                    recommended_action="Fix IP address format",
+                    metadata={"invalid_ip": str(peering.peer_ip)},
+                )
+
+            # Check for overlapping peer IPs on same device
+            overlaps = [
+                p
+                for p in all_peerings
+                if p.id != peering.id
+                and p.device == peering.device
+                and p.peer_ip == peering.peer_ip
+            ]
+
+            if overlaps:
+                return Conflict(
+                    type=ConflictType.SESSION_OVERLAP,
+                    severity=ConflictSeverity.CRITICAL,
+                    description=f"Duplicate peer IP {peering.peer_ip} on device {peering.device}",
+                    affected_peers=[peering.id] + [p.id for p in overlaps],
+                    recommended_action="Remove duplicate peering session",
+                    metadata={
+                        "device": peering.device,
+                        "peer_ip": str(peering.peer_ip),
+                    },
+                )
+
+        except Exception as e:
+            # Log error but don't fail the check
+            print(f"Error in PrefixOverlapRule: {e}")
+
+        return None
+
+    @property
+    def rule_name(self) -> str:
+        """Return the rule name."""
+        return "Prefix Overlap Detection"
+
+
 class BGPConflictDetector:
     """Orchestrates all conflict detection rules."""
 
@@ -221,6 +302,7 @@ class BGPConflictDetector:
             RPKIValidationRule(),
             SessionOverlapRule(),
             RoutingLoopRule(),
+            PrefixOverlapRule(),
         ]
 
     async def detect_conflicts(

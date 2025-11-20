@@ -12,10 +12,11 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.util import get_remote_address
 
-from app.api.v1.routes import anomalies, bgp_peerings, customer, features, ml
+from app.api.v1.routes import anomalies, bgp_peerings, customer, features, health, ml
 from app.config import settings
 from app.dependencies import get_db_engine, get_redis
 from app.middleware.logging import RequestLoggingMiddleware, configure_structlog, logger
+from app.middleware.rate_limit import RateLimiterMiddleware
 from observability.metrics import metrics_router
 from observability.pyroscope_integration import start_pyroscope_profiling
 from observability.victoriametrics_integration import start_background_forwarder, stop_background_forwarder
@@ -117,6 +118,14 @@ def create_application() -> FastAPI:
     app.state.limiter = limiter
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
     app.add_middleware(SlowAPIMiddleware)
+    
+    # Add Redis-based rate limiting middleware
+    redis_client = get_redis()
+    app.add_middleware(
+        RateLimiterMiddleware,
+        redis_client=redis_client,
+        requests_per_minute=60,
+    )
 
     # Add CORS middleware
     app.add_middleware(
@@ -163,6 +172,9 @@ def create_application() -> FastAPI:
 
     # Register metrics router
     app.include_router(metrics_router)
+    
+    # Register health check router
+    app.include_router(health.router)
 
     # Health check endpoints
     @app.get(
