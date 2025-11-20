@@ -1,0 +1,55 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: bgp-backend-pod-kill
+  namespace: bgp-orchestrator
+spec:
+  action: pod-kill
+  mode: one
+  selector:
+    namespaces:
+      - bgp-orchestrator
+    labelSelectors:
+      app: bgp-orchestrator
+  scheduler:
+    cron: "0 1 * * *"  # Run at 1 AM daily
+  duration: "0s"  # Immediate kill
+
+---
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: bgp-backend-pod-failure
+  namespace: bgp-orchestrator
+spec:
+  action: pod-failure
+  mode: one
+  selector:
+    namespaces:
+      - bgp-orchestrator
+    labelSelectors:
+      app: bgp-orchestrator
+  duration: "2m"  # Pod failure for 2 minutes
+  scheduler:
+    cron: "0 5 * * *"  # Run at 5 AM daily
+
+---
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: bgp-backend-container-kill
+  namespace: bgp-orchestrator
+spec:
+  action: container-kill
+  mode: random-max-percent
+  value: "50"  # Kill 50% of containers
+  selector:
+    namespaces:
+      - bgp-orchestrator
+    labelSelectors:
+      app: bgp-orchestrator
+  containerNames:
+    - bgp-orchestrator
+  scheduler:
+    cron: "0 6 * * *"  # Run at 6 AM daily
+

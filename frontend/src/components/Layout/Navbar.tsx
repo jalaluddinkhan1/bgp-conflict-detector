@@ -94,8 +94,16 @@ const Navbar: React.FC = () => {
                 Search
               </button>
             </div>
-            <div className="flex items-center space-x-2 text-gray-700">
-              <span className="text-sm">admin</span>
+            <div className="flex items-center space-x-4">
+              <Link
+                to="/customer-portal"
+                className="text-sm text-gray-700 hover:text-gray-900"
+              >
+                Customer Portal
+              </Link>
+              <div className="flex items-center space-x-2 text-gray-700">
+                <span className="text-sm">admin</span>
+              </div>
             </div>
           </div>
         </div>

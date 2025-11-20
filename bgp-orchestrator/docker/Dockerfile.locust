@@ -1,0 +1,16 @@
+FROM python:3.11-slim
+
+WORKDIR /locust
+
+# Install dependencies
+RUN pip install --no-cache-dir locust==2.17.0 httpx==0.25.1
+
+# Copy test scripts
+COPY tests/load /locust
+
+# Expose Locust web UI
+EXPOSE 8089
+
+# Default command
+CMD ["locust", "-f", "bgp_load_test.py", "--host=http://bgp-orchestrator:8000"]
+

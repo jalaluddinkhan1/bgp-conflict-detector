@@ -1,0 +1,161 @@
+---
+# Rundeck Job: Generate Incident Report
+- id: generate-incident-report
+  name: Generate Incident Report
+  description: Generate incident report for post-mortem analysis
+  group: bgp-orchestrator
+  project: bgp-orchestrator
+  loglevel: INFO
+  
+  options:
+    - name: incident_id
+      label: Incident ID
+      description: Grafana OnCall incident ID
+      required: true
+      type: string
+    
+    - name: start_time
+      label: Start Time
+      description: Incident start time (ISO format)
+      required: true
+      type: string
+    
+    - name: end_time
+      label: End Time
+      description: Incident end time (ISO format)
+      required: false
+      type: string
+    
+    - name: output_format
+      label: Output Format
+      description: Report output format
+      required: false
+      default: "markdown"
+      values: ["markdown", "json", "html"]
+      type: option
+  
+  nodefilters:
+    filter: "tags: bgp-orchestrator"
+  
+  sequence:
+    commands:
+      - exec: |
+          INCIDENT_ID=$RD_OPTION_INCIDENT_ID
+          START_TIME=$RD_OPTION_START_TIME
+          END_TIME=${RD_OPTION_END_TIME:-$(date -u +"%Y-%m-%dT%H:%M:%SZ")}
+          FORMAT=$RD_OPTION_OUTPUT_FORMAT
+          
+          API_URL="${RD_CONFIG_API_URL:-http://bgp-orchestrator:8000}"
+          ONCALL_URL="${RD_CONFIG_ONCALL_URL:-http://oncall:8080}"
+          ONCALL_TOKEN="${RD_CONFIG_ONCALL_TOKEN}"
+          
+          echo "Generating incident report..."
+          echo "Incident ID: $INCIDENT_ID"
+          echo "Start Time: $START_TIME"
+          echo "End Time: $END_TIME"
+          
+          # Get incident details from OnCall
+          INCIDENT=$(curl -s -X GET \
+            "$ONCALL_URL/api/v1/incidents/$INCIDENT_ID" \
+            -H "Authorization: Bearer $ONCALL_TOKEN")
+          
+          # Get logs for time period
+          LOGS=$(kubectl logs deployment/bgp-orchestrator -n bgp-orchestrator \
+            --since-time="$START_TIME" \
+            --until-time="$END_TIME" 2>/dev/null || echo "Logs unavailable")
+          
+          # Get metrics for time period
+          METRICS=$(curl -s "$API_URL/metrics" | grep -E "(error|latency|requests)" || echo "Metrics unavailable")
+          
+          # Generate report
+          REPORT_FILE="/tmp/incident-report-$INCIDENT_ID.$FORMAT"
+          
+          case $FORMAT in
+            markdown)
+              cat > "$REPORT_FILE" <<EOF
+# Incident Report: $INCIDENT_ID
+
+## Summary
+- **Incident ID**: $INCIDENT_ID
+- **Start Time**: $START_TIME
+- **End Time**: $END_TIME
+- **Duration**: $(($(date -d "$END_TIME" +%s) - $(date -d "$START_TIME" +%s))) seconds
+
+## Incident Details
+\`\`\`json
+$INCIDENT
+\`\`\`
+
+## Logs
+\`\`\`
+$LOGS
+\`\`\`
+
+## Metrics
+\`\`\`
+$METRICS
+\`\`\`
+
+## Timeline
+- $START_TIME: Incident started
+- $END_TIME: Incident resolved
+
+## Root Cause
+(To be filled in)
+
+## Resolution
+(To be filled in)
+
+## Prevention
+(To be filled in)
+EOF
+              ;;
+            json)
+              jq -n \
+                --arg id "$INCIDENT_ID" \
+                --arg start "$START_TIME" \
+                --arg end "$END_TIME" \
+                --argjson incident "$INCIDENT" \
+                --arg logs "$LOGS" \
+                --arg metrics "$METRICS" \
+                '{
+                  incident_id: $id,
+                  start_time: $start,
+                  end_time: $end,
+                  incident: $incident,
+                  logs: $logs,
+                  metrics: $metrics
+                }' > "$REPORT_FILE"
+              ;;
+            html)
+              cat > "$REPORT_FILE" <<EOF
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Incident Report: $INCIDENT_ID</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { color: #333; }
+    pre { background: #f4f4f4; padding: 10px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>Incident Report: $INCIDENT_ID</h1>
+  <h2>Summary</h2>
+  <p><strong>Start Time:</strong> $START_TIME</p>
+  <p><strong>End Time:</strong> $END_TIME</p>
+  <h2>Incident Details</h2>
+  <pre>$INCIDENT</pre>
+  <h2>Logs</h2>
+  <pre>$LOGS</pre>
+  <h2>Metrics</h2>
+  <pre>$METRICS</pre>
+</body>
+</html>
+EOF
+              ;;
+          esac
+          
+          echo "Report generated: $REPORT_FILE"
+          cat "$REPORT_FILE"
+

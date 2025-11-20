@@ -1,0 +1,69 @@
+---
+# Rundeck Job: Restart BGP Session
+- id: restart-bgp-session
+  name: Restart BGP Session
+  description: Restart a specific BGP peering session
+  group: bgp-orchestrator
+  project: bgp-orchestrator
+  loglevel: INFO
+  
+  options:
+    - name: peering_id
+      label: Peering ID
+      description: ID of the BGP peering to restart
+      required: true
+      type: integer
+    
+    - name: device
+      label: Device Name
+      description: Device/router name
+      required: false
+      type: string
+    
+    - name: peer_ip
+      label: Peer IP
+      description: Peer IP address
+      required: false
+      type: string
+  
+  nodefilters:
+    filter: "tags: bgp-orchestrator"
+  
+  sequence:
+    commands:
+      - exec: |
+          # Get peering details
+          PEERING_ID=$RD_OPTION_PEERING_ID
+          API_URL="${RD_CONFIG_API_URL:-http://bgp-orchestrator:8000}"
+          API_TOKEN="${RD_CONFIG_API_TOKEN}"
+          
+          echo "Getting peering details for ID: $PEERING_ID"
+          PEERING=$(curl -s -X GET \
+            "$API_URL/api/v1/bgp-peerings/$PEERING_ID" \
+            -H "Authorization: Bearer $API_TOKEN")
+          
+          DEVICE=$(echo $PEERING | jq -r '.device')
+          PEER_IP=$(echo $PEERING | jq -r '.peer_ip')
+          
+          echo "Restarting BGP session:"
+          echo "  Device: $DEVICE"
+          echo "  Peer IP: $PEER_IP"
+          
+          # Update peering status to restart
+          curl -X PUT \
+            "$API_URL/api/v1/bgp-peerings/$PEERING_ID" \
+            -H "Authorization: Bearer $API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"status": "pending"}'
+          
+          sleep 5
+          
+          # Set back to active
+          curl -X PUT \
+            "$API_URL/api/v1/bgp-peerings/$PEERING_ID" \
+            -H "Authorization: Bearer $API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"status": "active"}'
+          
+          echo "BGP session restarted successfully"
+

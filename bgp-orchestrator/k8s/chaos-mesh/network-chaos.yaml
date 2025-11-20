@@ -1,0 +1,64 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: bgp-api-network-delay
+  namespace: bgp-orchestrator
+spec:
+  action: delay
+  mode: all
+  selector:
+    namespaces:
+      - bgp-orchestrator
+    labelSelectors:
+      app: bgp-orchestrator
+  delay:
+    latency: "500ms"
+    correlation: "100"
+    jitter: "100ms"
+  direction: both
+  duration: "10m"
+  scheduler:
+    cron: "0 2 * * *"  # Run at 2 AM daily
+
+---
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: bgp-api-network-partition
+  namespace: bgp-orchestrator
+spec:
+  action: partition
+  mode: one
+  selector:
+    namespaces:
+      - bgp-orchestrator
+    labelSelectors:
+      app: bgp-orchestrator
+  direction: both
+  duration: "5m"
+  scheduler:
+    cron: "0 3 * * *"  # Run at 3 AM daily
+
+---
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: bgp-db-network-delay
+  namespace: bgp-orchestrator
+spec:
+  action: delay
+  mode: all
+  selector:
+    namespaces:
+      - bgp-orchestrator
+    labelSelectors:
+      app: postgresql
+  delay:
+    latency: "200ms"
+    correlation: "100"
+    jitter: "50ms"
+  direction: both
+  duration: "10m"
+  scheduler:
+    cron: "0 4 * * *"  # Run at 4 AM daily
+

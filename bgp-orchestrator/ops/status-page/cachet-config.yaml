@@ -1,0 +1,75 @@
+# Cachet Status Page Configuration for BGP Orchestrator
+
+# Components to monitor
+components:
+  - name: BGP Orchestrator API
+    description: Main BGP Orchestrator API service
+    status: operational
+    group_id: 1
+    link: https://bgp.example.com
+    
+  - name: Database
+    description: PostgreSQL database
+    status: operational
+    group_id: 1
+    
+  - name: Redis Cache
+    description: Redis cache service
+    status: operational
+    group_id: 1
+    
+  - name: Kafka Streaming
+    description: Kafka message streaming
+    status: operational
+    group_id: 2
+    
+  - name: Feature Store
+    description: Feast feature store
+    status: operational
+    group_id: 2
+    
+  - name: ML Models
+    description: ML prediction services
+    status: operational
+    group_id: 2
+
+# Incident templates
+incident_templates:
+  - name: Service Degradation
+    message: "We are experiencing service degradation. Our team is investigating."
+    status: investigating
+    
+  - name: Partial Outage
+    message: "Some services are experiencing issues. We are working to resolve."
+    status: identified
+    
+  - name: Major Outage
+    message: "We are experiencing a major outage. All hands on deck."
+    status: watching
+
+# Metrics to display
+metrics:
+  - name: API Uptime
+    suffix: "%"
+    description: API uptime percentage
+    default_value: 100.0
+    calc_type: 1  # Sum
+    
+  - name: Response Time
+    suffix: "ms"
+    description: Average API response time
+    default_value: 50.0
+    calc_type: 0  # Average
+    
+  - name: Error Rate
+    suffix: "%"
+    description: Error rate percentage
+    default_value: 0.0
+    calc_type: 1  # Sum
+
+# Subscribers
+subscribers:
+  - email: noc@example.com
+    verified: true
+    global: true
+

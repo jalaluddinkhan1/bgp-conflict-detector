@@ -1,0 +1,30 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'load-test'
+    environment: 'testing'
+
+scrape_configs:
+  # BGP Orchestrator API
+  - job_name: 'bgp-orchestrator'
+    static_configs:
+      - targets: ['bgp-orchestrator:8000']
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+
+  # K6 Load Testing Metrics
+  - job_name: 'k6'
+    static_configs:
+      - targets: ['k6:6565']
+    scrape_interval: 5s
+
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+# Remote write to VictoriaMetrics (if enabled)
+# remote_write:
+#   - url: http://victoriametrics:8428/api/v1/write
+

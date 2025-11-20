@@ -1,0 +1,60 @@
+---
+# Rundeck Job: Failover to Backup Batfish
+- id: failover-batfish
+  name: Failover to Backup Batfish
+  description: Failover from primary to backup Batfish instance
+  group: bgp-orchestrator
+  project: bgp-orchestrator
+  loglevel: INFO
+  
+  options:
+    - name: backup_endpoint
+      label: Backup Batfish Endpoint
+      description: URL of backup Batfish instance
+      required: true
+      default: "http://batfish-backup:9996"
+      type: string
+    
+    - name: confirm
+      label: Confirm Failover
+      description: Confirm failover operation
+      required: true
+      default: "false"
+      type: boolean
+  
+  nodefilters:
+    filter: "tags: bgp-orchestrator"
+  
+  sequence:
+    commands:
+      - exec: |
+          if [ "$RD_OPTION_CONFIRM" != "true" ]; then
+            echo "ERROR: Confirmation required. Set confirm=true"
+            exit 1
+          fi
+          
+          BACKUP_ENDPOINT=$RD_OPTION_BACKUP_ENDPOINT
+          
+          echo "Testing backup Batfish connectivity..."
+          if ! curl -f -s "$BACKUP_ENDPOINT/v2/version" > /dev/null; then
+            echo "ERROR: Backup Batfish is not reachable"
+            exit 1
+          fi
+          
+          echo "Backup Batfish is reachable"
+          
+          # Update configuration
+          kubectl set env deployment/bgp-orchestrator \
+            BATFISH_ENDPOINT=$BACKUP_ENDPOINT \
+            -n bgp-orchestrator
+          
+          echo "Configuration updated"
+          
+          # Restart deployment to pick up new config
+          kubectl rollout restart deployment/bgp-orchestrator -n bgp-orchestrator
+          
+          echo "Waiting for rollout to complete..."
+          kubectl rollout status deployment/bgp-orchestrator -n bgp-orchestrator --timeout=5m
+          
+          echo "Failover to backup Batfish completed successfully"
+

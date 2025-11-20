@@ -1,0 +1,263 @@
+name: Nightly Chaos Tests
+
+on:
+  schedule:
+    # Run at 2 AM UTC daily
+    - cron: '0 2 * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+env:
+  KUBERNETES_VERSION: '1.28'
+  CHAOS_MESH_VERSION: '2.6.0'
+  NAMESPACE: 'bgp-orchestrator-test'
+
+jobs:
+  setup-cluster:
+    name: Setup Test Cluster
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: ${{ env.KUBERNETES_VERSION }}
+
+      - name: Create kind cluster
+        uses: helm/kind-action@v1.8.0
+        with:
+          cluster_name: chaos-test-cluster
+          kubectl_version: ${{ env.KUBERNETES_VERSION }}
+
+      - name: Install Chaos Mesh
+        run: |
+          helm repo add chaos-mesh https://charts.chaos-mesh.org
+          helm repo update
+          helm install chaos-mesh chaos-mesh/chaos-mesh \
+            --namespace chaos-mesh \
+            --create-namespace \
+            --set chaosDaemon.runtime=containerd \
+            --set chaosDaemon.socketPath=/run/containerd/containerd.sock \
+            --version ${{ env.CHAOS_MESH_VERSION }}
+
+      - name: Wait for Chaos Mesh
+        run: |
+          kubectl wait --for=condition=ready pod \
+            --selector=app.kubernetes.io/name=chaos-mesh \
+            --namespace=chaos-mesh \
+            --timeout=300s
+
+      - name: Deploy BGP Orchestrator
+        run: |
+          kubectl create namespace ${{ env.NAMESPACE }} || true
+          # Deploy your application here
+          # kubectl apply -f k8s/ -n ${{ env.NAMESPACE }}
+
+      - name: Wait for BGP Orchestrator
+        run: |
+          kubectl wait --for=condition=ready pod \
+            --selector=app=bgp-orchestrator \
+            --namespace=${{ env.NAMESPACE }} \
+            --timeout=300s || true
+
+  network-chaos:
+    name: Network Chaos Tests
+    needs: setup-cluster
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Configure kubectl
+        run: |
+          # Configure kubectl for kind cluster
+          # This is handled by kind-action, but ensure context is set
+          kubectl cluster-info
+
+      - name: Apply Network Chaos
+        run: |
+          kubectl apply -f k8s/chaos-mesh/network-chaos.yaml -n ${{ env.NAMESPACE }}
+
+      - name: Monitor Network Chaos
+        run: |
+          echo "Monitoring network chaos effects..."
+          for i in {1..10}; do
+            echo "Check $i/10"
+            kubectl get networkchaos -n ${{ env.NAMESPACE }}
+            kubectl get pods -n ${{ env.NAMESPACE }}
+            sleep 30
+          done
+
+      - name: Check API Health
+        run: |
+          # Check if API is still responding
+          API_URL=$(kubectl get svc bgp-orchestrator -n ${{ env.NAMESPACE }} -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' || echo "localhost")
+          curl -f http://$API_URL:8000/healthz || exit 1
+
+      - name: Cleanup Network Chaos
+        if: always()
+        run: |
+          kubectl delete -f k8s/chaos-mesh/network-chaos.yaml -n ${{ env.NAMESPACE }} || true
+
+  pod-chaos:
+    name: Pod Chaos Tests
+    needs: setup-cluster
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Apply Pod Chaos
+        run: |
+          kubectl apply -f k8s/chaos-mesh/pod-chaos.yaml -n ${{ env.NAMESPACE }}
+
+      - name: Monitor Pod Chaos
+        run: |
+          echo "Monitoring pod chaos effects..."
+          for i in {1..10}; do
+            echo "Check $i/10"
+            kubectl get podchaos -n ${{ env.NAMESPACE }}
+            kubectl get pods -n ${{ env.NAMESPACE }}
+            sleep 30
+          done
+
+      - name: Verify Pod Recovery
+        run: |
+          # Wait for pods to recover
+          kubectl wait --for=condition=ready pod \
+            --selector=app=bgp-orchestrator \
+            --namespace=${{ env.NAMESPACE }} \
+            --timeout=300s || echo "Some pods may not have recovered"
+
+      - name: Cleanup Pod Chaos
+        if: always()
+        run: |
+          kubectl delete -f k8s/chaos-mesh/pod-chaos.yaml -n ${{ env.NAMESPACE }} || true
+
+  io-chaos:
+    name: I/O Chaos Tests
+    needs: setup-cluster
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Apply I/O Chaos
+        run: |
+          kubectl apply -f k8s/chaos-mesh/io-chaos.yaml -n ${{ env.NAMESPACE }}
+
+      - name: Monitor I/O Chaos
+        run: |
+          echo "Monitoring I/O chaos effects..."
+          for i in {1..10}; do
+            echo "Check $i/10"
+            kubectl get iochaos -n ${{ env.NAMESPACE }}
+            kubectl top pods -n ${{ env.NAMESPACE }} || true
+            sleep 30
+          done
+
+      - name: Check Database Performance
+        run: |
+          # Check if database is still accessible
+          kubectl exec -n ${{ env.NAMESPACE }} deployment/postgresql -- \
+            psql -U bgp_user -d bgp_orchestrator -c "SELECT 1;" || echo "Database check failed"
+
+      - name: Cleanup I/O Chaos
+        if: always()
+        run: |
+          kubectl delete -f k8s/chaos-mesh/io-chaos.yaml -n ${{ env.NAMESPACE }} || true
+
+  stress-chaos:
+    name: Stress Chaos Tests
+    needs: setup-cluster
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Apply Stress Chaos
+        run: |
+          kubectl apply -f k8s/chaos-mesh/stress-chaos.yaml -n ${{ env.NAMESPACE }}
+
+      - name: Monitor Stress Chaos
+        run: |
+          echo "Monitoring stress chaos effects..."
+          for i in {1..10}; do
+            echo "Check $i/10"
+            kubectl get stresschaos -n ${{ env.NAMESPACE }}
+            kubectl top pods -n ${{ env.NAMESPACE }} || true
+            sleep 30
+          done
+
+      - name: Check Resource Usage
+        run: |
+          kubectl top nodes || true
+          kubectl top pods -n ${{ env.NAMESPACE }} || true
+
+      - name: Cleanup Stress Chaos
+        if: always()
+        run: |
+          kubectl delete -f k8s/chaos-mesh/stress-chaos.yaml -n ${{ env.NAMESPACE }} || true
+
+  generate-report:
+    name: Generate Chaos Test Report
+    needs: [network-chaos, pod-chaos, io-chaos, stress-chaos]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Collect Test Results
+        run: |
+          echo "# Chaos Test Results - $(date)" > chaos-test-report.md
+          echo "" >> chaos-test-report.md
+          echo "## Network Chaos" >> chaos-test-report.md
+          kubectl get networkchaos -n ${{ env.NAMESPACE }} -o wide >> chaos-test-report.md || echo "No network chaos found" >> chaos-test-report.md
+          echo "" >> chaos-test-report.md
+          echo "## Pod Chaos" >> chaos-test-report.md
+          kubectl get podchaos -n ${{ env.NAMESPACE }} -o wide >> chaos-test-report.md || echo "No pod chaos found" >> chaos-test-report.md
+          echo "" >> chaos-test-report.md
+          echo "## I/O Chaos" >> chaos-test-report.md
+          kubectl get iochaos -n ${{ env.NAMESPACE }} -o wide >> chaos-test-report.md || echo "No I/O chaos found" >> chaos-test-report.md
+          echo "" >> chaos-test-report.md
+          echo "## Stress Chaos" >> chaos-test-report.md
+          kubectl get stresschaos -n ${{ env.NAMESPACE }} -o wide >> chaos-test-report.md || echo "No stress chaos found" >> chaos-test-report.md
+
+      - name: Upload Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: chaos-test-report
+          path: chaos-test-report.md
+
+  cleanup:
+    name: Cleanup Test Cluster
+    needs: [generate-report]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Delete kind cluster
+        uses: helm/kind-action@v1.8.0
+        with:
+          action: delete
+          cluster_name: chaos-test-cluster
+

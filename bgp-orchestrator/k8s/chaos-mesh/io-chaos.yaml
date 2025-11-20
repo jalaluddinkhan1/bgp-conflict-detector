@@ -1,0 +1,65 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: IOChaos
+metadata:
+  name: postgres-slow-io
+  namespace: bgp-orchestrator
+spec:
+  action: latency
+  mode: one
+  selector:
+    namespaces:
+      - bgp-orchestrator
+    labelSelectors:
+      app: postgresql
+  volumePath: /var/lib/postgresql/data
+  path: "/var/lib/postgresql/data/**"
+  delay: "500ms"
+  percent: 50  # 50% of I/O operations will be delayed
+  duration: "10m"
+  scheduler:
+    cron: "0 7 * * *"  # Run at 7 AM daily
+
+---
+apiVersion: chaos-mesh.org/v1alpha1
+kind: IOChaos
+metadata:
+  name: postgres-io-error
+  namespace: bgp-orchestrator
+spec:
+  action: fault
+  mode: one
+  selector:
+    namespaces:
+      - bgp-orchestrator
+    labelSelectors:
+      app: postgresql
+  volumePath: /var/lib/postgresql/data
+  path: "/var/lib/postgresql/data/**"
+  errno: 5  # I/O error
+  percent: 10  # 10% of I/O operations will fail
+  duration: "5m"
+  scheduler:
+    cron: "0 8 * * *"  # Run at 8 AM daily
+
+---
+apiVersion: chaos-mesh.org/v1alpha1
+kind: IOChaos
+metadata:
+  name: redis-slow-io
+  namespace: bgp-orchestrator
+spec:
+  action: latency
+  mode: one
+  selector:
+    namespaces:
+      - bgp-orchestrator
+    labelSelectors:
+      app: redis
+  volumePath: /data
+  path: "/data/**"
+  delay: "200ms"
+  percent: 30  # 30% of I/O operations will be delayed
+  duration: "5m"
+  scheduler:
+    cron: "0 9 * * *"  # Run at 9 AM daily
+

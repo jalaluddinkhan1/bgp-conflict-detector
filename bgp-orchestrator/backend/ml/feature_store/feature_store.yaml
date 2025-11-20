@@ -1,0 +1,11 @@
+project: bgp_orchestrator
+registry: data/registry.db
+provider: local
+online_store:
+  type: redis
+  connection_string: ${REDIS_URL}
+offline_store:
+  type: file
+  path: data/offline_store
+entity_key_serialization_version: 2
+

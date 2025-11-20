@@ -1,0 +1,88 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: StressChaos
+metadata:
+  name: bgp-backend-cpu-stress
+  namespace: bgp-orchestrator
+spec:
+  mode: one
+  selector:
+    namespaces:
+      - bgp-orchestrator
+    labelSelectors:
+      app: bgp-orchestrator
+  stressors:
+    cpu:
+      workers: 4
+      load: 90  # 90% CPU load
+      options: ["--cpu-method", "sqrt"]
+  duration: "10m"
+  scheduler:
+    cron: "0 10 * * *"  # Run at 10 AM daily
+
+---
+apiVersion: chaos-mesh.org/v1alpha1
+kind: StressChaos
+metadata:
+  name: bgp-backend-memory-stress
+  namespace: bgp-orchestrator
+spec:
+  mode: one
+  selector:
+    namespaces:
+      - bgp-orchestrator
+    labelSelectors:
+      app: bgp-orchestrator
+  stressors:
+    memory:
+      workers: 2
+      size: "1Gi"  # Allocate 1Gi of memory
+      options: ["--vm-bytes", "1Gi", "--vm-keep"]
+  duration: "5m"
+  scheduler:
+    cron: "0 11 * * *"  # Run at 11 AM daily
+
+---
+apiVersion: chaos-mesh.org/v1alpha1
+kind: StressChaos
+metadata:
+  name: postgres-cpu-stress
+  namespace: bgp-orchestrator
+spec:
+  mode: one
+  selector:
+    namespaces:
+      - bgp-orchestrator
+    labelSelectors:
+      app: postgresql
+  stressors:
+    cpu:
+      workers: 2
+      load: 80  # 80% CPU load
+  duration: "10m"
+  scheduler:
+    cron: "0 12 * * *"  # Run at 12 PM daily
+
+---
+apiVersion: chaos-mesh.org/v1alpha1
+kind: StressChaos
+metadata:
+  name: bgp-backend-combined-stress
+  namespace: bgp-orchestrator
+spec:
+  mode: one
+  selector:
+    namespaces:
+      - bgp-orchestrator
+    labelSelectors:
+      app: bgp-orchestrator
+  stressors:
+    cpu:
+      workers: 4
+      load: 90
+    memory:
+      workers: 2
+      size: "512Mi"
+  duration: "15m"
+  scheduler:
+    cron: "0 13 * * *"  # Run at 1 PM daily
+

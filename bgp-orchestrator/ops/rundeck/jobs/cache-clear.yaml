@@ -1,0 +1,47 @@
+---
+# Rundeck Job: Clear Redis Cache
+- id: cache-clear-redis
+  name: Clear Redis Cache
+  description: Clear Redis cache for BGP Orchestrator
+  group: bgp-orchestrator
+  project: bgp-orchestrator
+  loglevel: INFO
+  
+  options:
+    - name: cache_pattern
+      label: Cache Pattern
+      description: Redis key pattern to clear (e.g., bgp:peering:*)
+      required: false
+      default: "*"
+      type: string
+    
+    - name: confirm
+      label: Confirm Clear
+      description: Confirm cache clear operation
+      required: true
+      default: "false"
+      type: boolean
+  
+  nodefilters:
+    filter: "tags: redis"
+  
+  sequence:
+    commands:
+      - exec: |
+          if [ "$RD_OPTION_CONFIRM" != "true" ]; then
+            echo "ERROR: Confirmation required. Set confirm=true"
+            exit 1
+          fi
+          
+          if [ "$RD_OPTION_CACHE_PATTERN" == "*" ]; then
+            echo "Clearing all cache keys..."
+            redis-cli -h redis FLUSHDB
+          else
+            echo "Clearing cache keys matching pattern: $RD_OPTION_CACHE_PATTERN"
+            redis-cli -h redis --scan --pattern "$RD_OPTION_CACHE_PATTERN" | \
+              xargs -r redis-cli -h redis DEL
+          fi
+          
+          echo "Cache cleared successfully"
+          redis-cli -h redis INFO stats | grep keyspace_hits
+

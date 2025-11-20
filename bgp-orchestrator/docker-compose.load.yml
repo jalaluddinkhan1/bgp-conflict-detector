@@ -1,0 +1,182 @@
+version: '3.8'
+
+# Docker Compose for Load Testing Environment
+# Includes: K6, Locust, ExaBGP, Prometheus, and the BGP Orchestrator
+
+services:
+  # BGP Orchestrator Backend
+  bgp-orchestrator:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=postgresql://bgp_user:bgp_pass@postgres:5432/bgp_orchestrator
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=${SECRET_KEY:-load-test-secret-key-min-32-chars-long}
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:5173
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - load-test-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=bgp_user
+      - POSTGRES_PASSWORD=bgp_pass
+      - POSTGRES_DB=bgp_orchestrator
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - load-test-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bgp_user"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - load-test-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Prometheus for Metrics
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus/prometheus.load.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - load-test-network
+
+  # K6 Load Testing
+  k6:
+    image: grafana/k6:latest
+    volumes:
+      - ./tests/load:/scripts
+      - k6-results:/results
+    environment:
+      - K6_BASE_URL=http://bgp-orchestrator:8000
+      - K6_AUTH_TOKEN=${K6_AUTH_TOKEN:-}
+    networks:
+      - load-test-network
+    command: run /scripts/bgp_load_test.js
+    profiles:
+      - load-test
+
+  # Locust Load Testing (Alternative)
+  locust:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.locust
+    ports:
+      - "8089:8089"
+    volumes:
+      - ./tests/load:/locust
+    environment:
+      - LOCUST_HOST=http://bgp-orchestrator:8000
+      - LOCUST_USERS=100
+      - LOCUST_SPAWN_RATE=10
+      - LOCUST_RUN_TIME=5m
+    networks:
+      - load-test-network
+    command: locust -f /locust/bgp_load_test.py --host=http://bgp-orchestrator:8000 --web-host=0.0.0.0
+    profiles:
+      - load-test
+
+  # ExaBGP for BGP Session Simulation
+  exabgp:
+    image: exabgp/exabgp:latest
+    volumes:
+      - ./tests/load/exabgp:/etc/exabgp
+      - exabgp-logs:/var/log/exabgp
+    environment:
+      - EXABGP_CONFIG=/etc/exabgp/exabgp.conf
+    networks:
+      - load-test-network
+    command: exabgp /etc/exabgp/exabgp.conf
+    profiles:
+      - load-test
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+
+  # Pyroscope for Continuous Profiling
+  pyroscope:
+    image: pyroscope/pyroscope:latest
+    ports:
+      - "4040:4040"
+    volumes:
+      - pyroscope-data:/var/lib/pyroscope
+    command:
+      - server
+      - --storage-path=/var/lib/pyroscope
+    networks:
+      - load-test-network
+    profiles:
+      - profiling
+
+  # Grafana for Visualization
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - load-test-network
+    depends_on:
+      - prometheus
+
+volumes:
+  postgres-data:
+  redis-data:
+  prometheus-data:
+  k6-results:
+  exabgp-logs:
+  pyroscope-data:
+  grafana-data:
+
+networks:
+  load-test-network:
+    driver: bridge
+
