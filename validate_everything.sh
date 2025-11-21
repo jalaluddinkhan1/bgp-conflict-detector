@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Validating BGP Orchestrator 'Everything'..."
+echo "Validating BGP Orchestrator 'Everything'..."
 
 # Colors for output
 RED='\033[0;31m'
@@ -22,9 +22,9 @@ run_test() {
     
     echo -e "\n${YELLOW}Testing: $test_name${NC}"
     if eval "$test_command"; then
-        echo -e "${GREEN}✓ $test_name passed${NC}"
+        echo -e "${GREEN}[PASS] $test_name${NC}"
     else
-        echo -e "${RED}✗ $test_name failed${NC}"
+        echo -e "${RED}[FAIL] $test_name${NC}"
         FAILURES=$((FAILURES + 1))
     fi
 }
@@ -163,12 +163,12 @@ run_test "Rundeck Jobs" "
 # Summary
 echo -e "\n${YELLOW}========================================${NC}"
 if [ $FAILURES -eq 0 ]; then
-    echo -e "${GREEN}✅ ALL VALIDATIONS PASSED!${NC}"
-    echo -e "${GREEN}🎉 BGP Orchestrator is 'Everything' Ready!${NC}"
+    echo -e "${GREEN}[SUCCESS] ALL VALIDATIONS PASSED!${NC}"
+    echo -e "${GREEN}BGP Orchestrator validation complete.${NC}"
     exit 0
 else
-    echo -e "${RED}❌ $FAILURES validation(s) failed${NC}"
-    echo -e "${YELLOW}⚠️  Some validations may have been skipped (not available)${NC}"
+    echo -e "${RED}[FAILURE] $FAILURES validation(s) failed${NC}"
+    echo -e "${YELLOW}[WARNING] Some validations may have been skipped (not available)${NC}"
     exit 1
 fi
 

@@ -140,7 +140,7 @@ Remove the `scheduler` section to run immediately:
 
 ## Safety
 
-⚠️ **Warning**: These chaos experiments can cause service disruption. Use in:
+**Warning**: These chaos experiments can cause service disruption. Use in:
 - Staging environments
 - Dedicated test clusters
 - During maintenance windows

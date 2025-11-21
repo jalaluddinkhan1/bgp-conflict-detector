@@ -1,9 +1,6 @@
 # BGP Orchestrator
 
-[![CI/CD Pipeline](https://github.com/yourorg/bgp-orchestrator/actions/workflows/ci.yml/badge.svg)](https://github.com/yourorg/bgp-orchestrator/actions/workflows/ci.yml)
-[![Coverage](https://codecov.io/gh/yourorg/bgp-orchestrator/branch/main/graph/badge.svg)](https://codecov.io/gh/yourorg/bgp-orchestrator)
-[![Security Scan](https://github.com/yourorg/bgp-orchestrator/workflows/Security%20Scan/badge.svg)](https://github.com/yourorg/bgp-orchestrator/actions)
-[![Docker Image](https://img.shields.io/docker/v/bgp-orchestrator?label=docker)](https://hub.docker.com/r/bgp-orchestrator)
+[![CI/CD Pipeline](https://github.com/jalaluddinkhan1/bgp-conflict-detector/actions/workflows/ci.yml/badge.svg)](https://github.com/jalaluddinkhan1/bgp-conflict-detector/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
 **Enterprise BGP Network Orchestration and Conflict Detection Platform**
@@ -12,13 +9,13 @@ BGP Orchestrator is a production-ready platform for automated BGP configuration 
 
 ## Features
 
-- 🔄 **Automated BGP Configuration Management** - Full CRUD API for BGP peerings
-- 🛡️ **Conflict Detection** - Real-time detection of ASN collisions, routing loops, and session overlaps
-- 🔐 **Enterprise Security** - OAuth2 (Azure AD, Google, Okta), JWT authentication, RBAC, audit logging
-- 📊 **Observability** - Prometheus metrics, structured logging, Grafana dashboards
-- 🔌 **Vendor Integration** - Support for Nokia SR OS, with extensible driver architecture
-- 🌐 **External Services** - RIPE RIS integration, Batfish validation, SuzieQ device polling
-- 🐳 **Production Ready** - Docker, Kubernetes (Helm), CI/CD, automated testing
+- **Automated BGP Configuration Management**: Full CRUD API for BGP peerings with comprehensive validation
+- **Conflict Detection**: Real-time detection of ASN collisions, routing loops, and session overlaps using rule-based algorithms
+- **Enterprise Security**: OAuth2 integration (Azure AD, Google, Okta), JWT authentication, role-based access control (RBAC), and comprehensive audit logging
+- **Observability**: Prometheus metrics, structured logging, and Grafana dashboards for monitoring and analysis
+- **Vendor Integration**: Support for Nokia SR OS with extensible driver architecture for additional vendor support
+- **External Services**: RIPE RIS integration for historical BGP data, Batfish for network validation, and SuzieQ for device polling
+- **Production Ready**: Docker containerization, Kubernetes deployment with Helm charts, CI/CD pipelines, and comprehensive automated testing
 
 ## Quick Start
 
@@ -26,8 +23,8 @@ BGP Orchestrator is a production-ready platform for automated BGP configuration 
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourorg/bgp-orchestrator.git
-cd bgp-orchestrator
+git clone https://github.com/jalaluddinkhan1/bgp-conflict-detector.git
+cd bgp-conflict-detector/bgp-orchestrator
 
 # Start all services
 docker-compose -f docker/docker-compose.yml up -d
@@ -212,7 +209,7 @@ Pre-configured dashboards available in `grafana/dashboards/`:
 
 ## Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+We welcome contributions. Please follow these guidelines:
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -241,9 +238,8 @@ Licensed under the Apache License 2.0. See [LICENSE](LICENSE) for details.
 
 ## Support
 
-- **Documentation**: [docs.bgp-orchestrator.example.com](https://docs.bgp-orchestrator.example.com)
-- **Issues**: [GitHub Issues](https://github.com/yourorg/bgp-orchestrator/issues)
-- **Email**: support@bgp-orchestrator.example.com
+- **Documentation**: See [docs/](docs/) directory
+- **Issues**: [GitHub Issues](https://github.com/jalaluddinkhan1/bgp-conflict-detector/issues)
 
 ## Acknowledgments
 
@@ -253,7 +249,3 @@ Built with:
 - [Prometheus](https://prometheus.io/) - Monitoring and alerting
 - [Docker](https://www.docker.com/) - Containerization platform
 - [Kubernetes](https://kubernetes.io/) - Container orchestration
-
----
-
-

@@ -466,7 +466,7 @@ export default function CustomerPortal() {
                   <ul className="mt-4 space-y-2">
                     {currentPlan.features.map((feature, idx) => (
                       <li key={idx} className="text-sm text-gray-600">
-                        ✓ {feature}
+                        • {feature}
                       </li>
                     ))}
                   </ul>

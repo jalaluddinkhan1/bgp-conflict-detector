@@ -1,118 +1,130 @@
-# BGP Conflict Detector
+# BGP Conflict Detection System
 
-Enterprise-grade BGP network orchestration and conflict detection system with ML-based anomaly detection.
+A production-grade Border Gateway Protocol (BGP) network orchestration and conflict detection system with machine learning-based anomaly detection capabilities.
+
+## Overview
+
+This system provides comprehensive BGP peering session management, automated conflict detection, and predictive analytics for network routing stability. The architecture implements rule-based conflict detection algorithms, machine learning models for BGP flap prediction, and real-time monitoring capabilities.
 
 ## Features
 
-- **Conflict Detection**: Rule-based BGP conflict detection (ASN collision, RPKI validation, routing loops)
-- **ML-Powered**: XGBoost-based BGP flap prediction and anomaly detection
-- **Observability**: Comprehensive metrics, logging, and monitoring
-- **Real-Time**: Kafka integration for streaming BGP updates
-- **Secure**: JWT authentication, OAuth2, role-based access control
-- **Scalable**: Stateless design, horizontal scaling, Kubernetes-ready
+- **Conflict Detection**: Rule-based BGP conflict detection implementing algorithms for ASN collision detection, RPKI validation, routing loop detection, and session overlap analysis
+- **Machine Learning**: XGBoost-based BGP flap prediction and statistical anomaly detection
+- **Observability**: Comprehensive metrics collection, structured logging, and monitoring integration
+- **Real-Time Processing**: Kafka integration for streaming BGP update processing
+- **Security**: JWT-based authentication, OAuth2 integration, and role-based access control (RBAC)
+- **Scalability**: Stateless architecture design supporting horizontal scaling and Kubernetes deployment
 
-## Quick Start
+## Prerequisites
 
-### Prerequisites
+- Python 3.11 or higher
+- PostgreSQL 15 or higher
+- Redis 7 or higher
+- (Optional) InfluxDB for time-series data storage
+- (Optional) Apache Kafka for streaming data processing
+- (Optional) VictoriaMetrics for metrics storage
 
-- Python 3.11+
-- PostgreSQL 15+
-- Redis 7+
-- (Optional) InfluxDB, Kafka, VictoriaMetrics
+## Installation
 
-### Installation
+### 1. Clone Repository
 
-1. Clone the repository:
 ```bash
-git clone <repository-url>
-cd bgp-orchestrator/backend
+git clone https://github.com/jalaluddinkhan1/bgp-conflict-detector.git
+cd bgp-conflict-detector/bgp-orchestrator/backend
 ```
 
-2. Install dependencies:
+### 2. Install Dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Configure environment:
+### 3. Configuration
+
 ```bash
 cp .env.example .env
-# Edit .env with your configuration
+# Edit .env with your configuration parameters
 ```
 
-4. Run database migrations:
+### 4. Database Migration
+
 ```bash
 alembic upgrade head
 ```
 
-5. Start the application:
+### 5. Start Application
+
 ```bash
 python -m app.main
 ```
 
-The API will be available at `http://localhost:8000`
+The API service will be available at `http://localhost:8000`
 
 ## Project Structure
 
 ```
 backend/
-├── app/                    # FastAPI application
-│   ├── api/               # API routes
-│   ├── config.py          # Configuration
-│   ├── dependencies.py    # Dependency injection
+├── app/                    # FastAPI application framework
+│   ├── api/               # REST API route definitions
+│   ├── config.py          # Application configuration management
+│   ├── dependencies.py    # Dependency injection setup
 │   └── main.py            # Application entry point
-├── core/                   # Core conflict detection
+├── core/                   # Core conflict detection algorithms
 │   └── conflict_detector.py
 ├── ml/                     # Machine learning models
 │   ├── bgp_flap_predictor.py
 │   └── feature_store/
-├── models/                 # Database models
-├── schemas/                # Pydantic schemas
-├── services/               # External service clients
-├── storage/                # Storage backends (Redis, InfluxDB)
-├── utils/                  # Utility modules
+├── models/                 # Database models (SQLAlchemy ORM)
+├── schemas/                # Pydantic validation schemas
+├── services/               # External service integration clients
+├── storage/                # Storage backend implementations (Redis, InfluxDB)
+├── utils/                  # Utility modules and helper functions
 ├── tests/                  # Test suite
 ├── docs/                   # Documentation
-└── deployments/            # Deployment configs
+└── deployments/            # Deployment configurations
     ├── k8s/
     └── terraform/
 ```
 
 ## API Documentation
 
-Interactive API documentation is available at:
-- Swagger UI: `http://localhost:8000/docs`
-- ReDoc: `http://localhost:8000/redoc`
+Interactive API documentation is available when the service is running:
 
-See [docs/api.md](docs/api.md) for detailed API reference.
+- **Swagger UI**: `http://localhost:8000/docs`
+- **ReDoc**: `http://localhost:8000/redoc`
+
+For detailed API reference documentation, see [docs/api.md](docs/api.md).
 
 ## Development
 
-### Setup Development Environment
+### Development Environment Setup
 
 ```bash
 # Install development dependencies
 pip install -r requirements.txt
 pip install -e ".[dev]"
 
-# Run tests
+# Execute test suite
 pytest tests/
 
-# Run linting
+# Run code formatting
 black .
+
+# Run static analysis
 ruff check .
 mypy .
 ```
 
-### Running Tests
+### Test Execution
 
 ```bash
-# Run all tests
+# Execute all tests
 pytest
 
-# Run with coverage
+# Execute with coverage reporting
 pytest --cov=. --cov-report=html
 
-# Run specific test file
+# Execute specific test module
 pytest tests/unit/test_detector.py
 ```
 
@@ -122,56 +134,57 @@ See `.env.example` for all available configuration options.
 
 ### Key Configuration Variables
 
-- `DATABASE_URL`: PostgreSQL connection string
-- `REDIS_URL`: Redis connection string
-- `SECRET_KEY`: Secret key for cryptography (min 32 chars)
-- `KAFKA_ENABLED`: Enable Kafka streaming (default: false)
-- `VICTORIAMETRICS_ENABLED`: Enable VictoriaMetrics (default: false)
-- `FEATURE_STORE_ENABLED`: Enable Feast feature store (default: false)
+- `DATABASE_URL`: PostgreSQL database connection string
+- `REDIS_URL`: Redis connection string for caching
+- `SECRET_KEY`: Cryptographic secret key (minimum 32 characters)
+- `KAFKA_ENABLED`: Enable Kafka streaming integration (default: false)
+- `VICTORIAMETRICS_ENABLED`: Enable VictoriaMetrics integration (default: false)
+- `FEATURE_STORE_ENABLED`: Enable Feast feature store integration (default: false)
 
 ## Deployment
 
-### Docker
+### Docker Deployment
 
 ```bash
 docker build -t bgp-detector:latest -f Dockerfile .
 docker run -p 8000:8000 --env-file .env bgp-detector:latest
 ```
 
-### Kubernetes
+### Kubernetes Deployment
 
 ```bash
 kubectl apply -f deployments/k8s/
 ```
 
-See [docs/deployment.md](docs/deployment.md) for detailed deployment guide.
+For detailed deployment instructions, see [docs/deployment.md](docs/deployment.md).
 
 ## Monitoring
 
 ### Metrics
 
-Prometheus metrics are exposed at `/metrics`:
-- HTTP request metrics
-- ML prediction latency
+Prometheus metrics are exposed at `/metrics` endpoint:
+
+- HTTP request metrics (count, latency, error rates)
+- Machine learning prediction latency
 - Anomaly detection metrics
 - Conflict detection metrics
 
 ### Health Checks
 
-- Liveness: `GET /healthz`
-- Readiness: `GET /readyz`
-- Deep Health: `GET /health/healthz`
+- **Liveness Probe**: `GET /healthz`
+- **Readiness Probe**: `GET /readyz`
+- **Deep Health Check**: `GET /health/healthz`
 
 ## Architecture
 
-See [docs/architecture.md](docs/architecture.md) for system architecture overview.
+For detailed system architecture documentation, see [docs/architecture.md](docs/architecture.md).
 
 ## Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests and linting
+2. Create a feature branch (`git checkout -b feature/feature-name`)
+3. Implement changes with appropriate tests
+4. Execute test suite and linting
 5. Submit a pull request
 
 ## License
@@ -181,6 +194,6 @@ MIT License
 ## Support
 
 For issues and questions:
-- GitHub Issues: [Create an issue](https://github.com/yourorg/bgp-conflict-detector/issues)
-- Documentation: [docs/](docs/)
 
+- **GitHub Issues**: [Create an issue](https://github.com/jalaluddinkhan1/bgp-conflict-detector/issues)
+- **Documentation**: [docs/](docs/)
