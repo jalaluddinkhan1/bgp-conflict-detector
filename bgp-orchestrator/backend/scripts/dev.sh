@@ -8,7 +8,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-echo -e "${GREEN}🚀 BGP Conflict Detector - Development Helper${NC}"
+echo -e "${GREEN}BGP Conflict Detector - Development Helper${NC}"
 
 # Check if virtual environment exists
 if [ ! -d "venv" ]; then
@@ -45,6 +45,6 @@ black --check .
 ruff check .
 mypy .
 
-echo -e "${GREEN}✅ Development environment ready!${NC}"
+echo -e "${GREEN}Development environment ready!${NC}"
 echo -e "${GREEN}Run 'python -m app.main' to start the server${NC}"
 

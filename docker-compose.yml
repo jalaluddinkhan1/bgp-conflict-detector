@@ -45,17 +45,6 @@ services:
     ports:
       - "6379:6379"
 
-  conflict_api:
-    build: ./api
-    ports:
-      - "8002:8001"
-    environment:
-      INFRAHUB_URL: http://infrahub:8000
-      INFRAHUB_TOKEN: 18795e9c-b6db-fbff-cf87-10652e494a9a
-    depends_on:
-      infrahub:
-        condition: service_healthy
-
   gitlab-runner:
     image: gitlab/gitlab-runner:latest
     volumes:

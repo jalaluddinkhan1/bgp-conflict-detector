@@ -21,7 +21,7 @@ class AlertTemplate:
         Returns:
             Formatted alert message
         """
-        message = f"🚨 BGP Conflict Detected\n\n"
+        message = f"BGP Conflict Detected\n\n"
         message += f"Type: {conflict_type}\n"
         message += f"Severity: {severity.upper()}\n"
         message += f"Description: {description}\n"
@@ -48,7 +48,7 @@ class AlertTemplate:
         Returns:
             Formatted alert message
         """
-        message = f"⚠️ Anomaly Detected\n\n"
+        message = f"Anomaly Detected\n\n"
         message += f"Metric: {metric}\n"
         message += f"Value: {value}\n"
         message += f"Threshold: {threshold}\n"
@@ -74,7 +74,7 @@ class AlertTemplate:
         Returns:
             Formatted alert message
         """
-        message = f"🤖 High BGP Flap Probability Predicted\n\n"
+        message = f"High BGP Flap Probability Predicted\n\n"
         message += f"Flap Probability: {flap_probability:.2%}\n"
         message += f"Confidence: {confidence:.2%}\n"
         

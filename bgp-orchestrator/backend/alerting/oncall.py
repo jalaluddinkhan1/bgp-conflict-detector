@@ -288,7 +288,7 @@ class SlackNotifier:
             payload = {
                 "channel": "#noc-alerts",
                 "username": "BGP Orchestrator",
-                "icon_emoji": ":rotating_light:",
+                "icon_emoji": None,
                 "attachments": [
                     {
                         "color": color_map.get(severity, "#808080"),

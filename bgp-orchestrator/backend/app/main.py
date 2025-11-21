@@ -13,6 +13,7 @@ from slowapi.middleware import SlowAPIMiddleware
 from slowapi.util import get_remote_address
 
 from app.api.v1.routes import (
+    alerts,
     anomalies,
     auth,
     bgp_peerings,
@@ -213,6 +214,12 @@ def create_application() -> FastAPI:
     # Register peer endpoints router
     app.include_router(
         peer_endpoints.router,
+        prefix="/api/v1",
+    )
+
+    # Register alerts router
+    app.include_router(
+        alerts.router,
         prefix="/api/v1",
     )
 

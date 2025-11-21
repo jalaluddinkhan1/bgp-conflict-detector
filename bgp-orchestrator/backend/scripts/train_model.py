@@ -54,7 +54,7 @@ def main():
             print("Real data training not implemented yet. Use --use-synthetic flag.")
             sys.exit(1)
 
-        print("\n✅ Model training completed!")
+        print("\nModel training completed successfully.")
         print(f"  Accuracy: {metrics.get('accuracy', 'N/A'):.4f}")
         print(f"  Precision: {metrics.get('precision', 'N/A'):.4f}")
         print(f"  Recall: {metrics.get('recall', 'N/A'):.4f}")
@@ -62,7 +62,7 @@ def main():
         print(f"\nModel saved to: {args.output_dir}")
 
     except Exception as e:
-        print(f"\n❌ Training failed: {e}", file=sys.stderr)
+        print(f"\nTraining failed: {e}", file=sys.stderr)
         sys.exit(1)
 
 

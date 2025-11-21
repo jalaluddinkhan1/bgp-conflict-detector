@@ -66,17 +66,8 @@ def main():
         if not check_file_exists(filepath, desc):
             all_good = False
     
-    # Check API files
-    print("\nChecking API files...")
-    api_files = [
-        ("api/bgp_conflict_api.py", "FastAPI service"),
-        ("api/Dockerfile", "API Dockerfile"),
-        ("api/requirements.txt", "API requirements"),
-    ]
-    
-    for filepath, desc in api_files:
-        if not check_file_exists(filepath, desc):
-            all_good = False
+    # Note: Conflict detection API is now part of bgp-orchestrator
+    # No separate API service needed
     
     # Check config files
     print("\nChecking configuration files...")

@@ -4,12 +4,12 @@ Enterprise-grade BGP network orchestration and conflict detection system with ML
 
 ## Features
 
-- 🔍 **Conflict Detection**: Rule-based BGP conflict detection (ASN collision, RPKI validation, routing loops)
-- 🤖 **ML-Powered**: XGBoost-based BGP flap prediction and anomaly detection
-- 📊 **Observability**: Comprehensive metrics, logging, and monitoring
-- ⚡ **Real-Time**: Kafka integration for streaming BGP updates
-- 🔒 **Secure**: JWT authentication, OAuth2, role-based access control
-- 🚀 **Scalable**: Stateless design, horizontal scaling, Kubernetes-ready
+- **Conflict Detection**: Rule-based BGP conflict detection (ASN collision, RPKI validation, routing loops)
+- **ML-Powered**: XGBoost-based BGP flap prediction and anomaly detection
+- **Observability**: Comprehensive metrics, logging, and monitoring
+- **Real-Time**: Kafka integration for streaming BGP updates
+- **Secure**: JWT authentication, OAuth2, role-based access control
+- **Scalable**: Stateless design, horizontal scaling, Kubernetes-ready
 
 ## Quick Start
 

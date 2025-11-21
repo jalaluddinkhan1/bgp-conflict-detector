@@ -38,10 +38,10 @@ def run_migrations(command_name: str = "upgrade", revision: str = "head") -> Non
     
     if command_name == "upgrade":
         command.upgrade(alembic_cfg, revision)
-        print(f"✓ Migration upgraded to {revision}")
+        print(f"Migration upgraded to {revision}")
     elif command_name == "downgrade":
         command.downgrade(alembic_cfg, revision)
-        print(f"✓ Migration downgraded to {revision}")
+        print(f"Migration downgraded to {revision}")
     elif command_name == "current":
         command.current(alembic_cfg)
     elif command_name == "history":
@@ -59,6 +59,6 @@ if __name__ == "__main__":
     try:
         run_migrations(command_name, revision)
     except Exception as e:
-        print(f"✗ Migration failed: {e}")
+        print(f"Migration failed: {e}")
         sys.exit(1)
 
