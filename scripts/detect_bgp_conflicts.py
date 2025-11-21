@@ -9,10 +9,15 @@ import sys
 import json
 import yaml
 import argparse
+import ssl
 from datetime import datetime, timedelta
 from typing import Dict, List, Set, Tuple, Any
 import httpx
-from infrahub_sdk import InfrahubClientSync
+try:
+    from infrahub_sdk import InfrahubClientSync
+except ImportError:
+    print("ERROR: infrahub_sdk not installed. Install with: pip install infrahub-sdk")
+    sys.exit(1)
 from gql import gql, Client
 from gql.transport.requests import RequestsHTTPTransport
 
@@ -22,10 +27,12 @@ class BGPConflictDetector:
         self.infrahub_token = infrahub_token
         
         # GraphQL client for complex queries
+        # Note: verify=True should be used in production with proper certificates
+        verify_ssl = os.getenv("INFRAHUB_VERIFY_SSL", "false").lower() == "true"
         transport = RequestsHTTPTransport(
             url=f"{infrahub_url}/graphql",
             headers={'Authorization': f'Bearer {infrahub_token}'},
-            verify=False
+            verify=verify_ssl
         )
         self.graphql_client = Client(transport=transport, fetch_schema_from_transport=False)
         
@@ -201,7 +208,8 @@ class BGPConflictDetector:
                 'is_flapping': False,  # Placeholder for real telemetry
                 'state_changes': 0
             }
-        except:
+        except Exception as e:
+            print(f"WARNING: Failed to check session flapping for {session_name}: {e}")
             return {'is_flapping': False, 'state_changes': 0}
     
     def detect_conflicts(self, git_changes: Dict, recent_sessions: List[Dict]) -> List[Dict]:

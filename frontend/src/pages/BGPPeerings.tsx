@@ -22,7 +22,7 @@ const BGPPeeringsPage: React.FC = () => {
   const [pageSize, setPageSize] = useState(50);
   const [searchQuery, setSearchQuery] = useState('');
   
-  const { data: peeringsData, isLoading } = useQuery({
+  const { data: peeringsData, isLoading, isError, error } = useQuery({
     queryKey: ['bgp-peerings', filters, searchQuery, page, pageSize],
     queryFn: () => apiClient.getBGPPeerings({
       ...filters,
@@ -41,6 +41,10 @@ const BGPPeeringsPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['bgp-peerings'] });
       setSelectedIds([]);
     },
+    onError: (error: any) => {
+      console.error('Failed to delete peering:', error);
+      alert(`Failed to delete peering: ${error.message || 'Unknown error'}`);
+    },
   });
   
   const bulkDeleteMutation = useMutation({
@@ -48,6 +52,10 @@ const BGPPeeringsPage: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bgp-peerings'] });
       setSelectedIds([]);
+    },
+    onError: (error: any) => {
+      console.error('Failed to delete peerings:', error);
+      alert(`Failed to delete peerings: ${error.message || 'Unknown error'}`);
     },
   });
   
@@ -57,6 +65,10 @@ const BGPPeeringsPage: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bgp-peerings'] });
       setSelectedIds([]);
+    },
+    onError: (error: any) => {
+      console.error('Failed to update peerings:', error);
+      alert(`Failed to update peerings: ${error.message || 'Unknown error'}`);
     },
   });
   
@@ -175,6 +187,12 @@ const BGPPeeringsPage: React.FC = () => {
                     <tr>
                       <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
                         Loading...
+                      </td>
+                    </tr>
+                  ) : isError ? (
+                    <tr>
+                      <td colSpan={6} className="px-4 py-8 text-center text-red-500">
+                        Error loading peerings: {error instanceof Error ? error.message : 'Unknown error'}
                       </td>
                     </tr>
                   ) : peerings.length === 0 ? (

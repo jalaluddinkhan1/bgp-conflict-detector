@@ -10,6 +10,7 @@ from typing import Any
 import httpx
 
 from app.config import settings
+from utils.circuit_breaker import circuit_breaker
 
 
 class BGPSessionState(str, Enum):
@@ -98,6 +99,12 @@ class SuzieQClient:
 
         raise Exception("Request failed") from last_exception
 
+    @circuit_breaker(
+        failure_threshold=5,
+        recovery_timeout=60.0,
+        expected_exception=(httpx.HTTPError, httpx.TimeoutException, Exception),
+        name="suzieq_poll_bgp_sessions",
+    )
     async def poll_bgp_sessions(self, device: str) -> list[BGPSession]:
         """
         Poll BGP sessions from a specific device.
@@ -147,6 +154,12 @@ class SuzieQClient:
             # Return empty list on error (could also raise)
             return []
 
+    @circuit_breaker(
+        failure_threshold=5,
+        recovery_timeout=60.0,
+        expected_exception=(httpx.HTTPError, httpx.TimeoutException, Exception),
+        name="suzieq_get_device_inventory",
+    )
     async def get_device_inventory(self) -> list[Device]:
         """
         Get inventory of all devices.

@@ -5,6 +5,8 @@ from datetime import datetime
 from enum import Enum
 from typing import Any
 
+import ipaddress
+import re
 from pydantic import BaseModel, Field, field_validator, IPvAnyAddress, model_validator
 
 
@@ -28,14 +30,31 @@ class AddressFamily(str, Enum):
 class BGPPeeringBase(BaseModel):
     """Base schema with common fields for BGP peering."""
 
-    name: str = Field(..., min_length=1, max_length=255, description="Peering session name")
+    name: str = Field(
+        ...,
+        min_length=1,
+        max_length=255,
+        pattern=r"^[a-zA-Z0-9_-]{1,255}$",
+        description="Peering session name (alphanumeric, underscore, hyphen only)",
+    )
     local_asn: int = Field(..., ge=1, le=4294967295, description="Local ASN")
     peer_asn: int = Field(..., ge=1, le=4294967295, description="Peer ASN")
     peer_ip: IPvAnyAddress = Field(..., description="Peer IP address (IPv4 or IPv6)")
     hold_time: int = Field(..., ge=3, le=65535, description="BGP hold time in seconds")
     keepalive: int = Field(..., ge=1, le=65535, description="BGP keepalive interval in seconds")
-    device: str = Field(..., min_length=1, max_length=255, description="Device/router name")
-    interface: str | None = Field(default=None, max_length=255, description="Interface name")
+    device: str = Field(
+        ...,
+        min_length=1,
+        max_length=255,
+        pattern=r"^[a-zA-Z0-9._-]{1,255}$",
+        description="Device/router name (alphanumeric, dot, underscore, hyphen only)",
+    )
+    interface: str | None = Field(
+        default=None,
+        max_length=255,
+        pattern=r"^[a-zA-Z0-9/._-]{0,255}$",
+        description="Interface name (alphanumeric, slash, dot, underscore, hyphen only)",
+    )
     status: PeeringStatus = Field(default=PeeringStatus.PENDING, description="Peering status")
     address_families: list[AddressFamily] = Field(
         default_factory=lambda: [AddressFamily.IPV4],
@@ -54,6 +73,25 @@ class BGPPeeringBase(BaseModel):
                 f"keepalive ({self.keepalive}) must be less than or equal to one-third of hold_time ({self.hold_time})"
             )
         return self
+
+    @field_validator("peer_ip")
+    @classmethod
+    def validate_ip(cls, v: IPvAnyAddress) -> IPvAnyAddress:
+        """Validate IP address format and ensure it's not a loopback or multicast address."""
+        ip_str = str(v)
+        try:
+            ip = ipaddress.ip_address(ip_str)
+            if ip.is_loopback:
+                raise ValueError("Peer IP cannot be a loopback address")
+            if ip.is_multicast:
+                raise ValueError("Peer IP cannot be a multicast address")
+            if ip.is_link_local:
+                raise ValueError("Peer IP cannot be a link-local address")
+        except ValueError as e:
+            if "Peer IP" in str(e):
+                raise
+            raise ValueError(f"Invalid IP address format: {ip_str}")
+        return v
 
     @field_validator("local_asn", "peer_asn")
     @classmethod

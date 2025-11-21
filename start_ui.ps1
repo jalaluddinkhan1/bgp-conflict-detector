@@ -22,7 +22,7 @@ Start-Process npm -ArgumentList "run dev" -WindowStyle Minimized
 Set-Location ..
 
 Write-Host ""
-Write-Host "Backend running on http://localhost:8000" -ForegroundColor Cyan
+Write-Host "Backend running on http://localhost:8001" -ForegroundColor Cyan
 Write-Host "Frontend running on http://localhost:3000" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Press any key to stop..." -ForegroundColor Yellow

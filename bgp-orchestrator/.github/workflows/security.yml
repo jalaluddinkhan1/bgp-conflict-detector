@@ -1,0 +1,40 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 0 * * 0"  # Weekly
+
+jobs:
+  sast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Bandit
+        uses: securecodewarrior/github-action-bandit@v1
+        with:
+          path: bgp-orchestrator/backend
+      - name: Run Safety
+        uses: pyupio/safety@master
+        with:
+          path: bgp-orchestrator/backend/requirements.txt
+        continue-on-error: true
+
+  dependency-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pip-audit
+        run: pip install pip-audit
+      - name: Run pip-audit
+        run: |
+          cd bgp-orchestrator/backend
+          pip-audit -r requirements.txt
+

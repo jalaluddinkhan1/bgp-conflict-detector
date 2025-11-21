@@ -8,22 +8,34 @@ import httpx
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.dependencies import DbSession, RedisClient, get_db_engine
+from app.dependencies import DbSession, RedisClient, get_db_engine, CurrentUser
 from app.config import settings
+from security.auth import require_role, UserRole
 
 router = APIRouter(prefix="/health", tags=["Health"])
 
 
-@router.get("/healthz")
-async def healthz(
+@router.get("/healthz", include_in_schema=False)
+async def healthz() -> dict[str, str]:
+    """
+    Public health check endpoint - minimal information for Kubernetes probes.
+    
+    Does not expose sensitive metrics or detailed diagnostics.
+    """
+    return {"status": "healthy"}
+
+
+@router.get("/healthz/internal", dependencies=[Depends(require_role(UserRole.ADMIN))])
+async def healthz_internal(
     db: DbSession,
     redis: RedisClient,
+    user: CurrentUser,
 ) -> dict[str, Any]:
     """
-    Deep health check - checks all critical dependencies.
-
+    Internal health check with detailed diagnostics - requires admin authentication.
+    
     Returns:
-        Health status with detailed checks
+        Health status with detailed checks including latency metrics
     """
     checks: dict[str, Any] = {}
 

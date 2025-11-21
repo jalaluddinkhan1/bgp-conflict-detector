@@ -7,6 +7,7 @@ from enum import Enum
 from sqlalchemy import (
     JSON,
     BigInteger,
+    Boolean,
     Column,
     DateTime,
     Enum as SQLEnum,
@@ -76,6 +77,26 @@ class BGPPeering(Base):
         comment="Routing policy configuration",
     )
 
+    # Soft delete fields
+    is_deleted = Column(
+        Boolean,
+        default=False,
+        nullable=False,
+        index=True,
+        comment="Soft delete flag - marks record as deleted without removing it",
+    )
+    deleted_at = Column(
+        DateTime(timezone=True),
+        nullable=True,
+        index=True,
+        comment="Timestamp when record was soft deleted",
+    )
+    deleted_by = Column(
+        String(255),
+        nullable=True,
+        comment="User who soft deleted the peering",
+    )
+
     # Audit fields
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     updated_at = Column(DateTime(timezone=True), nullable=True, onupdate=func.now())
@@ -84,7 +105,7 @@ class BGPPeering(Base):
 
     # Relationships
     # audit_logs = relationship("AuditLog", back_populates="peering", cascade="all, delete-orphan")
-    # tags = relationship("Tag", secondary="peering_tags", back_populates="peerings")
+    tags = relationship("Tag", secondary="peering_tags", back_populates="peerings", lazy="selectin")
 
     # Indexes for common queries
     __table_args__ = (

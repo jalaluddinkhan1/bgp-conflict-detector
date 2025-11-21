@@ -23,7 +23,7 @@ npm run dev &
 FRONTEND_PID=$!
 cd ..
 
-echo "Backend running on http://localhost:8000 (PID: $BACKEND_PID)"
+echo "Backend running on http://localhost:8001 (PID: $BACKEND_PID)"
 echo "Frontend running on http://localhost:3000 (PID: $FRONTEND_PID)"
 echo ""
 echo "Press Ctrl+C to stop both servers"

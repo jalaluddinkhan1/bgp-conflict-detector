@@ -1,13 +1,17 @@
-version: '3.8'
-
 services:
   infrahub:
     image: registry.opsmill.io/opsmill/infrahub:0.16
     command: infrahub server start --debug
     environment:
       INFRAHUB_DB_TYPE: memgraph
+      INFRAHUB_DB_HOSTNAME: database
+      INFRAHUB_DB_PORT: 7687
       INFRAHUB_BROKER_TYPE: rabbitmq
+      INFRAHUB_BROKER_HOST: message_queue
+      INFRAHUB_BROKER_PORT: 5672
       INFRAHUB_CACHE_TYPE: redis
+      INFRAHUB_CACHE_HOST: cache
+      INFRAHUB_CACHE_PORT: 6379
       INFRAHUB_SECURITY_INITIAL_ADMIN_TOKEN: 18795e9c-b6db-fbff-cf87-10652e494a9a
       INFRAHUB_ALLOW_ANONYMOUS_TELEMETRY: false
     ports:
@@ -22,10 +26,10 @@ services:
       retries: 10
 
   database:
-    image: memgraph/memgraph:2.18
+    image: memgraph/memgraph:latest
     ports:
       - "7687:7687"
-    command: ["--memory-limit=2gb", "--log-level=WARNING"]
+    command: ["--memory-limit=2147483648", "--log-level=WARNING"]
 
   message_queue:
     image: rabbitmq:3.12-management
@@ -44,7 +48,7 @@ services:
   conflict_api:
     build: ./api
     ports:
-      - "8001:8001"
+      - "8002:8001"
     environment:
       INFRAHUB_URL: http://infrahub:8000
       INFRAHUB_TOKEN: 18795e9c-b6db-fbff-cf87-10652e494a9a

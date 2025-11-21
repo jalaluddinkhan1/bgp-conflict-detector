@@ -99,6 +99,30 @@ vendor_api_calls = Counter(
     registry=registry,
 )
 
+vendor_api_health = Gauge(
+    "bgp_orchestrator_vendor_api_healthy",
+    "Vendor API health status (1=healthy, 0=unhealthy)",
+    ["vendor", "endpoint"],
+    registry=registry,
+)
+
+# RPKI Validation Metrics
+rpki_validation_failures = Counter(
+    "bgp_orchestrator_rpki_failures_total",
+    "RPKI validation failures",
+    ["prefix", "origin_asn"],
+    registry=registry,
+)
+
+# Conflict Detection Metrics (enhanced)
+conflict_detection_latency = Histogram(
+    "bgp_orchestrator_conflict_detection_duration_seconds",
+    "Time to detect conflicts",
+    ["rule_type"],
+    buckets=[0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0, 5.0],
+    registry=registry,
+)
+
 vendor_api_latency = Histogram(
     "vendor_api_latency_seconds",
     "Vendor API call latency",

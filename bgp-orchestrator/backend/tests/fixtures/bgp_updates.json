@@ -1,0 +1,32 @@
+[
+  {
+    "type": "announce",
+    "peer_ip": "192.0.2.1",
+    "peer_asn": 65001,
+    "prefix": "192.0.2.0/24",
+    "as_path": [65001, 65002, 65003],
+    "origin": "IGP",
+    "next_hop": "192.0.2.1",
+    "communities": ["65001:100"],
+    "timestamp": "2024-01-01T00:00:00Z"
+  },
+  {
+    "type": "withdraw",
+    "peer_ip": "192.0.2.1",
+    "peer_asn": 65001,
+    "prefix": "192.0.3.0/24",
+    "timestamp": "2024-01-01T01:00:00Z"
+  },
+  {
+    "type": "announce",
+    "peer_ip": "203.0.113.1",
+    "peer_asn": 65002,
+    "prefix": "203.0.113.0/24",
+    "as_path": [65002],
+    "origin": "IGP",
+    "next_hop": "203.0.113.1",
+    "communities": ["65002:200"],
+    "timestamp": "2024-01-01T02:00:00Z"
+  }
+]
+

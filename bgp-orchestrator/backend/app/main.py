@@ -12,7 +12,19 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.util import get_remote_address
 
-from app.api.v1.routes import anomalies, bgp_peerings, customer, features, health, ml
+from app.api.v1.routes import (
+    anomalies,
+    auth,
+    bgp_peerings,
+    customer,
+    features,
+    health,
+    ml,
+    tags,
+    autonomous_systems,
+    peer_groups,
+    peer_endpoints,
+)
 from app.config import settings
 from app.dependencies import get_db_engine, get_redis
 from app.middleware.logging import RequestLoggingMiddleware, configure_structlog, logger
@@ -102,9 +114,9 @@ def create_application() -> FastAPI:
         title="BGP Orchestrator API",
         description="Enterprise BGP network orchestration and conflict detection API",
         version="1.0.0",
-        docs_url="/docs",
-        redoc_url="/redoc",
-        openapi_url="/openapi.json",
+        docs_url="/api/v1/docs",
+        redoc_url="/api/v1/redoc",
+        openapi_url="/api/v1/openapi.json",
         lifespan=lifespan,
         responses={
             401: {"description": "Unauthorized"},
@@ -138,8 +150,18 @@ def create_application() -> FastAPI:
 
     # Add request logging middleware
     app.add_middleware(RequestLoggingMiddleware)
+    
+    # Add API versioning middleware
+    from app.middleware.api_version import APIVersionMiddleware
+    app.add_middleware(APIVersionMiddleware, required_version="1.0")
 
     # Register routers
+    # Register auth router (OAuth2)
+    app.include_router(
+        auth.router,
+        prefix="/api/v1",
+    )
+    
     app.include_router(
         bgp_peerings.router,
         prefix="/api/v1",
@@ -167,6 +189,30 @@ def create_application() -> FastAPI:
     # Register customer portal router
     app.include_router(
         customer.router,
+        prefix="/api/v1",
+    )
+
+    # Register tags router
+    app.include_router(
+        tags.router,
+        prefix="/api/v1",
+    )
+
+    # Register autonomous systems router
+    app.include_router(
+        autonomous_systems.router,
+        prefix="/api/v1",
+    )
+
+    # Register peer groups router
+    app.include_router(
+        peer_groups.router,
+        prefix="/api/v1",
+    )
+
+    # Register peer endpoints router
+    app.include_router(
+        peer_endpoints.router,
         prefix="/api/v1",
     )
 

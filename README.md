@@ -1,4 +1,4 @@
-# Nautobot-Style BGP Management Platform
+# BGP Management Platform
 
 A production-ready, feature-complete web application for managing BGP (Border Gateway Protocol) network infrastructure with a modern, intuitive UI inspired by Nautobot.
 
@@ -34,7 +34,7 @@ python seed_data.py
 python run.py
 ```
 
-Backend runs on: `http://localhost:8000`
+Backend runs on: `http://localhost:8001`
 
 ### Frontend Setup
 
@@ -174,5 +174,5 @@ See `/docs` for complete API documentation when backend is running.
 Open source - use as needed.
 
 ## Contributing
-
+~ KAI
 This is a production-ready reference implementation. Feel free to extend and customize for your needs.

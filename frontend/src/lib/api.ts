@@ -306,7 +306,7 @@ export const apiClient = {
     const response = await api.get(`/bgp-session-states/${id}`);
     return response.data;
   },
-  updateSessionState: async (id: number, data: Partial<SessionState>) => {
+  updateSessionState: async (id: number, data: Partial<BGPSessionState>) => {
     const response = await api.put(`/bgp-session-states/${id}`, data);
     return response.data;
   },
@@ -321,59 +321,5 @@ export const apiClient = {
     return response.data;
   },
 };
-
-export interface AddressFamily {
-  id: number;
-  routing_instance_id: number;
-  afi: string;
-  safi: string;
-  enabled: boolean;
-  description?: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface RoutingPolicy {
-  id: number;
-  name: string;
-  description?: string;
-  type: string;
-  rules?: any;
-  priority: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface Tag {
-  id: number;
-  name: string;
-  slug: string;
-  color: string;
-  description?: string;
-  created_at: string;
-}
-
-export interface Secret {
-  id: number;
-  name: string;
-  type: string;
-  secret_value: string;
-  description?: string;
-  peer_endpoint_id?: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface SessionState {
-  id: number;
-  peering_id: number;
-  state: string;
-  last_state_change?: string;
-  uptime_seconds: number;
-  prefixes_received: number;
-  prefixes_advertised: number;
-  error_message?: string;
-  updated_at: string;
-}
 
 export default api;

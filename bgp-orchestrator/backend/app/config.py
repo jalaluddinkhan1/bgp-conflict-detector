@@ -33,8 +33,10 @@ class Settings(BaseSettings):
         description="PostgreSQL database connection URL",
         examples=["postgresql://user:password@localhost:5432/bgp_orchestrator"],
     )
-    DATABASE_POOL_SIZE: int = Field(default=10, ge=1, le=100)
-    DATABASE_MAX_OVERFLOW: int = Field(default=20, ge=0)
+    DATABASE_POOL_SIZE: int = Field(default=20, ge=1, le=100, description="Base connection pool size")
+    DATABASE_MAX_OVERFLOW: int = Field(default=10, ge=0, description="Emergency connections beyond pool_size")
+    DATABASE_POOL_TIMEOUT: int = Field(default=30, ge=1, description="Seconds to wait for connection before failing")
+    DATABASE_POOL_PRE_PING: bool = Field(default=True, description="Detect stale connections before use")
 
     # Redis Configuration
     REDIS_URL: str = Field(
@@ -62,6 +64,10 @@ class Settings(BaseSettings):
     OAUTH2_CLIENT_ID: str | None = None
     OAUTH2_CLIENT_SECRET: str | None = None
     OAUTH2_TENANT_ID: str | None = None  # For Azure AD
+    OAUTH2_REDIRECT_URI: str | None = Field(
+        default=None,
+        description="OAuth2 redirect URI for callback (e.g., http://localhost:8000/api/v1/auth/callback)",
+    )
 
     # External Service Endpoints
     BATFISH_ENDPOINT: str | None = Field(

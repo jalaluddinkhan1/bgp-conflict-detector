@@ -10,6 +10,7 @@ from typing import Any
 import httpx
 
 from app.config import settings
+from utils.circuit_breaker import circuit_breaker, CircuitBreakerOpenError
 
 
 class ValidationSeverity(str, Enum):
@@ -130,6 +131,12 @@ class BatfishClient:
         except FileNotFoundError:
             raise Exception("Docker not found - cannot manage Batfish container")
 
+    @circuit_breaker(
+        failure_threshold=5,
+        recovery_timeout=60.0,
+        expected_exception=(httpx.HTTPError, httpx.TimeoutException, Exception),
+        name="batfish_validate_bgp_config",
+    )
     async def validate_bgp_config(self, config: str) -> ValidationResult:
         """
         Validate BGP configuration using Batfish.

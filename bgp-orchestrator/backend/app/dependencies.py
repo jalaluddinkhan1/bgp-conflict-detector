@@ -8,6 +8,7 @@ from fastapi import Depends, HTTPException, status
 from redis import Redis
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import Session
+from sqlalchemy.pool import AsyncAdaptedQueuePool
 
 from app.config import settings
 from core.conflict_detector import BGPConflictDetector
@@ -24,11 +25,14 @@ def get_db_engine():
     global _engine
     if _engine is None:
         # Convert postgresql:// to postgresql+asyncpg:// for async support
-        database_url = settings.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+        database_url = str(settings.DATABASE_URL).replace("postgresql://", "postgresql+asyncpg://")
         _engine = create_async_engine(
             database_url,
-            pool_size=settings.DATABASE_POOL_SIZE,
-            max_overflow=settings.DATABASE_MAX_OVERFLOW,
+            poolclass=AsyncAdaptedQueuePool,
+            pool_size=settings.DATABASE_POOL_SIZE,              # Base connections
+            max_overflow=settings.DATABASE_MAX_OVERFLOW,        # Emergency connections
+            pool_timeout=settings.DATABASE_POOL_TIMEOUT,         # Wait time before failing
+            pool_pre_ping=settings.DATABASE_POOL_PRE_PING,      # Detect stale connections
             echo=False,
         )
     return _engine

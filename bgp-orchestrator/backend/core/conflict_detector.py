@@ -1,6 +1,7 @@
 """
 BGP conflict detection system using rule-based architecture.
 """
+import asyncio
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
@@ -297,7 +298,7 @@ class BGPConflictDetector:
         self, peering: BGPPeering, all_peerings: list[BGPPeering] | None = None
     ) -> list[Conflict]:
         """
-        Run all conflict detection rules on a peering session.
+        Run all conflict detection rules on a peering session concurrently with timeout.
 
         Args:
             peering: The peering session to check
@@ -311,14 +312,42 @@ class BGPConflictDetector:
 
         conflicts: list[Conflict] = []
 
-        # Run all rules
+        # Run all rules concurrently with timeout
+        tasks = []
         for rule in self.rules:
-            try:
-                conflict = await rule.check(peering, all_peerings)
-                if conflict:
-                    conflicts.append(conflict)
-            except Exception as e:
-                pass
+            task = asyncio.wait_for(
+                rule.check(peering, all_peerings),
+                timeout=5.0,  # 5 second timeout per rule
+            )
+            tasks.append((task, rule.rule_name))
+
+        # Execute all tasks concurrently
+        try:
+            results = await asyncio.gather(*[t[0] for t in tasks], return_exceptions=True)
+            
+            # Process results
+            for i, result in enumerate(results):
+                rule_name = tasks[i][1]
+                if isinstance(result, asyncio.TimeoutError):
+                    # Log timeout but don't fail the entire check
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.warning(f"Conflict detection rule '{rule_name}' timed out after 5 seconds")
+                    # Fail open: allow the peering if detection times out
+                    continue
+                elif isinstance(result, Exception):
+                    # Log exception but continue with other rules
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.error(f"Conflict detection rule '{rule_name}' failed: {result}")
+                    continue
+                elif result is not None:
+                    conflicts.append(result)
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Conflict detection failed: {e}")
+            # Fail open: return empty list if detection fails completely
 
         return conflicts
 

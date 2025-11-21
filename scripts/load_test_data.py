@@ -15,15 +15,17 @@ TOKEN = os.getenv("INFRAHUB_TOKEN", "18795e9c-b6db-fbff-cf87-10652e494a9a")
 def wait_for_infrahub():
     """Wait for Infrahub to be ready"""
     print("Waiting for Infrahub to be ready...")
-    client = httpx.Client()
+    client = httpx.Client(timeout=5.0)
     for i in range(30):
         try:
             response = client.get(f"{INFRAHUB_URL}/api/info")
             if response.status_code == 200:
                 print("Infrahub is ready!")
                 return True
-        except:
-            pass
+        except httpx.RequestError as e:
+            print(f"Connection attempt {i+1}/30 failed: {e}")
+        except Exception as e:
+            print(f"Unexpected error: {e}")
         time.sleep(2)
     print("ERROR: Infrahub not ready after 60 seconds")
     sys.exit(1)
@@ -38,8 +40,9 @@ def load_test_data():
         for device in client.filters(kind="InfraDevice", name__value="router*"):
             if device.name.startswith(("router01", "router02", "router03")):
                 device.delete()
-    except:
-        pass
+    except Exception as e:
+        print(f"WARNING: Failed to clean old test data: {e}")
+        # Continue anyway
     
     print("Creating test infrastructure...")
     

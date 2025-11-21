@@ -46,10 +46,65 @@ class EncryptionKeyManager:
         return None
 
     @staticmethod
-    def derive_key_from_password(password: str, salt: bytes | None = None) -> bytes:
-        """Derive a Fernet key from a password using PBKDF2."""
+    async def derive_key_from_password_async(password: str, redis_client: Any = None) -> bytes:
+        """
+        Derive a Fernet key from a password using PBKDF2 with dynamic salt from Redis.
+        
+        Args:
+            password: Password to derive key from
+            redis_client: Redis client instance (optional, will generate new salt if None)
+        
+        Returns:
+            Derived encryption key
+        """
+        import secrets
+        
+        salt_key = "encryption_salt"
+        salt: bytes | None = None
+        
+        # Try to get salt from Redis if available
+        if redis_client:
+            try:
+                stored_salt = redis_client.get(salt_key)
+                if stored_salt:
+                    if isinstance(stored_salt, str):
+                        salt = base64.b64decode(stored_salt)
+                    else:
+                        salt = stored_salt
+            except Exception:
+                pass  # Fall through to generate new salt
+        
+        # Generate new salt if not found
         if salt is None:
-            salt = b"bgp_orchestrator_salt"
+            salt = secrets.token_bytes(16)
+            # Store in Redis if available
+            if redis_client:
+                try:
+                    redis_client.set(salt_key, base64.b64encode(salt).decode("utf-8"))
+                except Exception:
+                    pass  # Continue even if Redis write fails
+        
+        kdf = PBKDF2HMAC(
+            algorithm=hashes.SHA256(),
+            length=32,
+            salt=salt,
+            iterations=100000,
+        )
+        key = base64.urlsafe_b64encode(kdf.derive(password.encode()))
+        return key
+    
+    @staticmethod
+    def derive_key_from_password(password: str, salt: bytes | None = None) -> bytes:
+        """
+        Derive a Fernet key from a password using PBKDF2.
+        
+        WARNING: This method uses a static salt if none provided. 
+        Use derive_key_from_password_async() for production with Redis-backed salt.
+        """
+        if salt is None:
+            # Generate a random salt as fallback (not stored, so not ideal)
+            import secrets
+            salt = secrets.token_bytes(16)
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=32,

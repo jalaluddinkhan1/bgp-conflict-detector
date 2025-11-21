@@ -64,11 +64,20 @@ class RateLimiterMiddleware(BaseHTTPMiddleware):
         if self.redis_client is None:
             self.redis_client = get_redis()
 
-        # Get client IP
-        client_ip = request.client.host if request.client else "unknown"
+        # Get user ID from request state (set by auth middleware) or fallback to IP
+        user_id = None
+        if hasattr(request.state, "user") and request.state.user:
+            user_id = getattr(request.state.user, "id", None)
+        
+        # Use user ID if available, otherwise fall back to IP (for unauthenticated requests)
+        if user_id:
+            identifier = f"user:{user_id}"
+        else:
+            client_ip = request.client.host if request.client else "unknown"
+            identifier = f"ip:{client_ip}"
 
         # Rate limit key
-        key = f"rate_limit:{client_ip}"
+        key = f"rate_limit:{identifier}"
         now = time.time()
 
         try:
